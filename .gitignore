@@ -1,0 +1,4 @@
+__pycache__
+.streamlit/secrets.toml
+coupon_fab.db
+.claude
