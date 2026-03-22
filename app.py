@@ -687,6 +687,37 @@ def priority_color(p):
     return {"High": "#ff5555", "Medium": "#ffc400", "Low": "#00e888"}.get(p, "#aaa")
 
 
+def _build_jira_comment(coupon_id: str, phase: int, summary: str, adv_comment: str = "") -> str:
+    """Build a rich Jira comment with sign-off details and user comments for a phase."""
+    lines = [summary, ""]
+
+    # Sign-off details (for multi-role phases)
+    sigs = db.get_signoffs(coupon_id, phase)
+    if sigs:
+        lines.append("Sign-offs:")
+        for s in sigs:
+            entry = f"  - {s['display_name']} ({s['role']})"
+            if s.get("notes"):
+                entry += f" | {s['notes']}"
+            lines.append(entry)
+        lines.append("")
+
+    # User comments from this phase
+    all_comments = db.get_phase_comments(coupon_id)
+    phase_comments = [c for c in all_comments if c["phase"] == phase and c.get("comment")]
+    if phase_comments:
+        lines.append("Comments:")
+        for c in phase_comments:
+            lines.append(f"  - [{c['action']}] {c['display_name']}: {c['comment']}")
+        lines.append("")
+
+    # Advance comment
+    if adv_comment and adv_comment.strip():
+        lines.append(f"Advance note: {adv_comment.strip()}")
+
+    return "\n".join(lines)
+
+
 # ── DEMO MODE: PHASE ACTION MODAL ─────────────────────────────────────────────
 @st.dialog("◈ PHASE ACTION", width="large")
 def phase_action_dialog():
@@ -1048,11 +1079,16 @@ def phase_action_dialog():
                     if coupon.get("jira_ticket"):
                         sigs = db.get_signoffs(coupon_id, phase)
                         names = ", ".join(s["display_name"] for s in sigs)
+                        jira_comment = _build_jira_comment(
+                            coupon_id, phase,
+                            f"Phase {phase} COMPLETE — confirmed by: {names}. Advancing to Phase {_SIGNOFF_CFG['advance_to']}.",
+                            adv_cmt,
+                        )
                         with st.spinner("Updating Jira…"):
                             jira_api.advance_phase(
                                 coupon["jira_ticket"],
                                 new_phase=_SIGNOFF_CFG["advance_to"],
-                                comment=f"Phase {phase} COMPLETE — confirmed by: {names}. Advancing to Phase {_SIGNOFF_CFG['advance_to']}.",
+                                comment=jira_comment,
                             )
                     st.rerun()
 
@@ -1127,16 +1163,15 @@ def phase_action_dialog():
                 db.add_phase_comment(coupon_id, 3, "submit", uname(), udisp(), p3_comment)
                 st.session_state.pop("modal_errs", None)
                 if coupon.get("jira_ticket"):
+                    jira_comment = _build_jira_comment(
+                        coupon_id, 3,
+                        f"Phase 3 COMPLETE — Engineering data submitted.\n"
+                        f"NX Model: {nx_model.strip()} | TC EBOM: {tc_ebom.strip()}\n"
+                        f"Submitted by: {udisp()} ({uname()})\n"
+                        f"Unlocking parallel: Phase 4 (Procurement) · Phase 5 (Instructions) · Phase 6 (Resourcing).",
+                    )
                     with st.spinner("Updating Jira…"):
-                        jira_api.advance_phase(
-                            coupon["jira_ticket"], new_phase=4,
-                            comment=(
-                                f"Phase 3 COMPLETE — Engineering data submitted.\n"
-                                f"NX Model: {nx_model.strip()} | TC EBOM: {tc_ebom.strip()}\n"
-                                f"Submitted by: {udisp()} ({uname()})\n"
-                                f"Unlocking parallel: Phase 4 (Procurement) · Phase 5 (Instructions) · Phase 6 (Resourcing)."
-                            ),
-                        )
+                        jira_api.advance_phase(coupon["jira_ticket"], new_phase=4, comment=jira_comment)
                 _close()
                 st.rerun()
 
@@ -1206,11 +1241,14 @@ def phase_action_dialog():
                 db.add_phase_comment(coupon_id, 4, "submit", uname(), udisp(), p4_comment)
                 st.session_state.pop("modal_errs", None)
                 if coupon.get("jira_ticket"):
+                    jira_comment = _build_jira_comment(
+                        coupon_id, 4,
+                        f"Phase 4 COMPLETE — Procurement submitted by {udisp()}.\n"
+                        f"PR: {pr_number.strip()} | Vendor: {vendor.strip()} | Delivery: {delivery_date}\n"
+                        f"Advancing to Phase 7: Material Receiving.",
+                    )
                     with st.spinner("Updating Jira…"):
-                        jira_api.advance_phase(
-                            coupon["jira_ticket"], new_phase=7,
-                            comment=f"Phase 4 COMPLETE — Procurement submitted by {udisp()}.\nPR: {pr_number.strip()} | Vendor: {vendor.strip()} | Delivery: {delivery_date}\nAdvancing to Phase 7: Material Receiving.",
-                        )
+                        jira_api.advance_phase(coupon["jira_ticket"], new_phase=7, comment=jira_comment)
                 st.markdown(
                     f'<div style="padding:18px;border:1px solid #00d4ff;background:#0e2a40;'
                     f'border-radius:2px;text-align:center;margin:12px 0">'
@@ -1292,11 +1330,14 @@ def phase_action_dialog():
                 db.add_phase_comment(coupon_id, 6, "submit", uname(), udisp(), p6_comment)
                 st.session_state.pop("modal_errs", None)
                 if coupon.get("jira_ticket"):
+                    jira_comment = _build_jira_comment(
+                        coupon_id, 6,
+                        f"Phase 6 COMPLETE — Work allocation submitted by {udisp()}.\n"
+                        f"Technician: {technician.strip()} | Start: {start_date} | End: {end_date}\n"
+                        f"Converging to Phase 8: Work Execution.",
+                    )
                     with st.spinner("Updating Jira…"):
-                        jira_api.advance_phase(
-                            coupon["jira_ticket"], new_phase=8,
-                            comment=f"Phase 6 COMPLETE — Work allocation submitted by {udisp()}.\nTechnician: {technician.strip()} | Start: {start_date} | End: {end_date}\nConverging to Phase 8: Work Execution.",
-                        )
+                        jira_api.advance_phase(coupon["jira_ticket"], new_phase=8, comment=jira_comment)
                 st.markdown(
                     f'<div style="padding:18px;border:1px solid #00d4ff;background:#0e2a40;'
                     f'border-radius:2px;text-align:center;margin:12px 0">'
@@ -1429,14 +1470,12 @@ def phase_action_dialog():
                     db.close_work_order(coupon_id, uname())
                     jira_ok = {"label_ok": True, "comment_ok": True, "transition_ok": True}
                     if coupon.get("jira_ticket"):
-                        sigs = db.get_signoffs(coupon_id, 9)
-                        qe_rec = next((s for s in sigs if s["role"] == "QE"), None)
-                        close_note = qe_rec["notes"] if qe_rec else "NCR review complete."
+                        jira_comment = _build_jira_comment(
+                            coupon_id, 9,
+                            f"Work order CLOSED — Phase 9 NCR review complete.\nClosed by: {udisp()} ({uname()})",
+                        )
                         with st.spinner("Closing Jira ticket…"):
-                            jira_ok = jira_api.close_issue(
-                                coupon["jira_ticket"],
-                                comment=f"Work order CLOSED — Phase 9 NCR review complete.\nClosed by: {udisp()} ({uname()})\nQE Assessment: {close_note}",
-                            )
+                            jira_ok = jira_api.close_issue(coupon["jira_ticket"], comment=jira_comment)
                     st.markdown(
                         f'<div style="padding:18px;border:1px solid #00d4ff;background:#0e2a40;'
                         f'border-radius:2px;text-align:center;margin:12px 0">'
@@ -2295,15 +2334,17 @@ def page_phase2():
                 if coupon.get("jira_ticket"):
                     signoffs = db.get_signoffs(coupon_id, 2)
                     names = ", ".join(s["display_name"] for s in signoffs)
+                    jira_comment = _build_jira_comment(
+                        coupon_id, 2,
+                        f"Phase 2 COMPLETE — Alignment sign-offs received from: {names}. "
+                        f"Advancing to Phase 3: NX Design + TC EBOM creation.",
+                    )
                     with st.spinner("Updating Jira…"):
                         jira_api.transition_issue(coupon["jira_ticket"], "In Design")
                         jira_api.advance_phase(
                             coupon["jira_ticket"],
                             new_phase=3,
-                            comment=(
-                                f"Phase 2 COMPLETE — Alignment sign-offs received from: {names}. "
-                                f"Advancing to Phase 3: NX Design + TC EBOM creation."
-                            ),
+                            comment=jira_comment,
                         )
                 go("phase3", coupon_id)
         else:
@@ -2445,17 +2486,15 @@ def page_phase3():
             db.add_phase_comment(coupon_id, 3, "submit", uname(), udisp(), p3_comment)
             st.session_state.errs = {}
             if coupon.get("jira_ticket"):
+                jira_comment = _build_jira_comment(
+                    coupon_id, 3,
+                    f"Phase 3 COMPLETE — Engineering data submitted.\n"
+                    f"NX Model: {nx_model.strip()} | TC EBOM: {tc_ebom.strip()}\n"
+                    f"Submitted by: {udisp()} ({uname()})\n"
+                    f"Unlocking parallel: Phase 4 (Procurement) · Phase 5 (Instructions) · Phase 6 (Resourcing).",
+                )
                 with st.spinner("Updating Jira…"):
-                    jira_api.advance_phase(
-                        coupon["jira_ticket"],
-                        new_phase=4,
-                        comment=(
-                            f"Phase 3 COMPLETE — Engineering data submitted.\n"
-                            f"NX Model: {nx_model.strip()} | TC EBOM: {tc_ebom.strip()}\n"
-                            f"Submitted by: {udisp()} ({uname()})\n"
-                            f"Unlocking parallel: Phase 4 (Procurement) · Phase 5 (Instructions) · Phase 6 (Resourcing)."
-                        ),
-                    )
+                    jira_api.advance_phase(coupon["jira_ticket"], new_phase=4, comment=jira_comment)
             st.markdown(
                 f'<div style="padding:22px;border:1px solid #00d4ff;background:#001520;'
                 f'border-radius:2px;text-align:center;margin:16px 0">'
@@ -2602,15 +2641,14 @@ def page_phase4():
             db.add_phase_comment(coupon_id, 4, "submit", uname(), udisp(), p4_comment)
             st.session_state.errs = {}
             if coupon.get("jira_ticket"):
+                jira_comment = _build_jira_comment(
+                    coupon_id, 4,
+                    f"Phase 4 COMPLETE — Procurement submitted by {udisp()}.\n"
+                    f"PR: {pr_number.strip()} | Vendor: {vendor.strip()} | Delivery: {delivery_date}\n"
+                    f"Advancing to Phase 7: Material Receiving.",
+                )
                 with st.spinner("Updating Jira…"):
-                    jira_api.advance_phase(
-                        coupon["jira_ticket"], new_phase=7,
-                        comment=(
-                            f"Phase 4 COMPLETE — Procurement submitted by {udisp()}.\n"
-                            f"PR: {pr_number.strip()} | Vendor: {vendor.strip()} | Delivery: {delivery_date}\n"
-                            f"Advancing to Phase 7: Material Receiving."
-                        ),
-                    )
+                    jira_api.advance_phase(coupon["jira_ticket"], new_phase=7, comment=jira_comment)
             st.markdown(
                 f'<div style="padding:22px;border:1px solid #00d4ff;background:#001520;'
                 f'border-radius:2px;text-align:center;margin:16px 0">'
@@ -2754,11 +2792,12 @@ def page_phase5():
                 if coupon.get("jira_ticket"):
                     sigs = db.get_signoffs(coupon_id, 5)
                     names = ", ".join(s["display_name"] for s in sigs)
+                    jira_comment = _build_jira_comment(
+                        coupon_id, 5,
+                        f"Phase 5 COMPLETE — Work instructions confirmed by: {names}. Converging to Phase 8: Work Execution.",
+                    )
                     with st.spinner("Updating Jira…"):
-                        jira_api.advance_phase(
-                            coupon["jira_ticket"], new_phase=8,
-                            comment=f"Phase 5 COMPLETE — Work instructions confirmed by: {names}. Converging to Phase 8: Work Execution.",
-                        )
+                        jira_api.advance_phase(coupon["jira_ticket"], new_phase=8, comment=jira_comment)
                 go("dashboard")
         else:
             st.markdown(
@@ -2904,14 +2943,13 @@ def page_phase6():
             st.session_state.errs = {}
             if coupon.get("jira_ticket"):
                 with st.spinner("Updating Jira…"):
-                    jira_api.advance_phase(
-                        coupon["jira_ticket"], new_phase=8,
-                        comment=(
-                            f"Phase 6 COMPLETE — Work allocation submitted by {udisp()}.\n"
-                            f"Technician: {technician.strip()} | Start: {start_date} | End: {end_date}\n"
-                            f"Converging to Phase 8: Work Execution."
-                        ),
+                    jira_comment = _build_jira_comment(
+                        coupon_id, 6,
+                        f"Phase 6 COMPLETE — Work allocation submitted by {udisp()}.\n"
+                        f"Technician: {technician.strip()} | Start: {start_date} | End: {end_date}\n"
+                        f"Converging to Phase 8: Work Execution.",
                     )
+                    jira_api.advance_phase(coupon["jira_ticket"], new_phase=8, comment=jira_comment)
             st.markdown(
                 f'<div style="padding:22px;border:1px solid #00d4ff;background:#001520;'
                 f'border-radius:2px;text-align:center;margin:16px 0">'
@@ -3067,11 +3105,12 @@ def page_phase_locked():
                         else:
                             db.advance_coupon_phase(coupon["coupon_id"], phase_num + 1)
                         if coupon.get("jira_ticket"):
+                            jira_comment = _build_jira_comment(
+                                coupon["coupon_id"], phase_num,
+                                f"Phase {phase_num} COMPLETE — advanced by {udisp()}.",
+                            )
                             with st.spinner("Updating Jira…"):
-                                jira_api.advance_phase(
-                                    coupon["jira_ticket"], new_phase=phase_num + 1,
-                                    comment=f"Phase {phase_num} COMPLETE — advanced by {udisp()}.",
-                                )
+                                jira_api.advance_phase(coupon["jira_ticket"], new_phase=phase_num + 1, comment=jira_comment)
                         st.session_state.nav_phase = phase_num + 1
                         st.rerun()
             else:
@@ -3081,11 +3120,12 @@ def page_phase_locked():
                     else:
                         db.advance_coupon_phase(coupon["coupon_id"], 9)
                         if coupon.get("jira_ticket"):
+                            jira_comment = _build_jira_comment(
+                                coupon["coupon_id"], 9,
+                                f"NCR phase complete — work order closed by {udisp()}.",
+                            )
                             with st.spinner("Updating Jira…"):
-                                jira_api.advance_phase(
-                                    coupon["jira_ticket"], new_phase=9,
-                                    comment=f"NCR phase complete — work order closed by {udisp()}.",
-                                )
+                                jira_api.advance_phase(coupon["jira_ticket"], new_phase=9, comment=jira_comment)
                         go("dashboard")
         else:
             st.markdown(
@@ -3227,11 +3267,12 @@ def page_phase7():
                     if coupon.get("jira_ticket"):
                         sigs = db.get_signoffs(coupon_id, 7)
                         names = ", ".join(s["display_name"] for s in sigs)
+                        jira_comment = _build_jira_comment(
+                            coupon_id, 7,
+                            f"Phase 7 COMPLETE — Materials confirmed by: {names}. Converging to Phase 8: Work Execution.",
+                        )
                         with st.spinner("Updating Jira…"):
-                            jira_api.advance_phase(
-                                coupon["jira_ticket"], new_phase=8,
-                                comment=f"Phase 7 COMPLETE — Materials confirmed by: {names}. Converging to Phase 8: Work Execution.",
-                            )
+                            jira_api.advance_phase(coupon["jira_ticket"], new_phase=8, comment=jira_comment)
                     go("dashboard")
         else:
             st.markdown(
@@ -3385,11 +3426,12 @@ def page_phase8():
                     if coupon.get("jira_ticket"):
                         sigs = db.get_signoffs(coupon_id, 8)
                         names = ", ".join(s["display_name"] for s in sigs)
+                        jira_comment = _build_jira_comment(
+                            coupon_id, 8,
+                            f"Phase 8 COMPLETE — Work execution confirmed by: {names}. Advancing to Phase 9: NCR review.",
+                        )
                         with st.spinner("Updating Jira…"):
-                            jira_api.advance_phase(
-                                coupon["jira_ticket"], new_phase=9,
-                                comment=f"Phase 8 COMPLETE — Work execution confirmed by: {names}. Advancing to Phase 9: NCR review.",
-                            )
+                            jira_api.advance_phase(coupon["jira_ticket"], new_phase=9, comment=jira_comment)
                     go("phase9", coupon_id)
         else:
             st.markdown(
@@ -3574,16 +3616,12 @@ def page_phase9():
                     # ── JIRA: label → phase-9-ncr, comment, transition → Done ──
                     jira_ok = {"label_ok": True, "comment_ok": True, "transition_ok": True}
                     if coupon.get("jira_ticket"):
-                        sigs = db.get_signoffs(coupon_id, 9)
-                        qe_rec = next((s for s in sigs if s["role"] == "QE"), None)
-                        close_note = qe_rec["notes"] if qe_rec else "NCR review complete."
-                        close_comment = (
-                            f"Work order CLOSED — Phase 9 NCR review complete.\n"
-                            f"Closed by: {udisp()} ({uname()})\n"
-                            f"QE Assessment: {close_note}"
+                        jira_comment = _build_jira_comment(
+                            coupon_id, 9,
+                            f"Work order CLOSED — Phase 9 NCR review complete.\nClosed by: {udisp()} ({uname()})",
                         )
                         with st.spinner("Closing Jira ticket…"):
-                            jira_ok = jira_api.close_issue(coupon["jira_ticket"], comment=close_comment)
+                            jira_ok = jira_api.close_issue(coupon["jira_ticket"], comment=jira_comment)
 
                     # ── RESULT BANNER ──────────────────────────────────────────
                     if coupon.get("jira_ticket"):
