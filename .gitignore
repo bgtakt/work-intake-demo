@@ -1,4 +1,25 @@
-__pycache__
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+venv/
+.venv/
+
+# Secrets
 .streamlit/secrets.toml
-coupon_fab.db
-.claude
+secrets.toml
+.env
+
+# Database
+data/coupon_fab.db
+data/*.db
+
+# OS
+Thumbs.db
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
+*.swp

@@ -1,8 +1,11 @@
 import streamlit as st
 import json
+import os
+import base64
 import db
 import viz
 import jira as jira_api
+import feedback
 
 st.set_page_config(
     page_title="WORK INTAKE | MTE",
@@ -39,7 +42,7 @@ ROLE_PHASES = {
 }
 
 # ── SESSION STATE ────────────────────────────────────────────────────────────
-_DEFAULTS = dict(auth=False, user=None, page="mode_select", coupon_id=None, errs={}, nav_phase=None, mode=None)
+_DEFAULTS = dict(auth=False, user=None, page="mode_select", coupon_id=None, errs={}, nav_phase=None, mode=None, show_feedback=False)
 for k, v in _DEFAULTS.items():
     if k not in st.session_state:
         st.session_state[k] = v
@@ -631,6 +634,38 @@ def page_mode_select():
                 st.session_state.page = "login"
                 st.rerun()
 
+        st.markdown("<br>", unsafe_allow_html=True)
+        _docs_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "static", "presentation.html")
+        try:
+            with open(_docs_path, "rb") as _f:
+                _docs_b64 = base64.b64encode(_f.read()).decode()
+            st.components.v1.html(
+                f"""
+                <div style="text-align:center">
+                  <a id="docs-link"
+                     style="cursor:pointer;color:#00d4ff;font-size:0.82em;letter-spacing:0.1em;
+                            text-decoration:none;border:1px solid #1e4a62;padding:8px 20px;
+                            border-radius:2px;background:rgba(0,212,255,0.06);display:inline-block">
+                    DOCUMENTATION
+                  </a>
+                </div>
+                <script>
+                  document.getElementById('docs-link').addEventListener('click', function() {{
+                    var b64 = "{_docs_b64}";
+                    var bin = atob(b64);
+                    var bytes = new Uint8Array(bin.length);
+                    for (var i = 0; i < bin.length; i++) {{ bytes[i] = bin.charCodeAt(i); }}
+                    var blob = new Blob([bytes], {{type:'text/html;charset=utf-8'}});
+                    var url = URL.createObjectURL(blob);
+                    window.open(url, '_blank');
+                  }});
+                </script>
+                """,
+                height=50,
+            )
+        except FileNotFoundError:
+            pass
+
 
 # ── HELPERS ───────────────────────────────────────────────────────────────────
 def go(page, coupon_id=None, nav_phase=None):
@@ -1024,13 +1059,13 @@ def phase_action_dialog():
                     unsafe_allow_html=True,
                 )
                 ref_val = ""
-                if ref_label:
-                    if textarea_ref:
-                        ref_val = st.text_area(ref_label, key=f"md_ref_{phase}_{r_key}", height=60, placeholder=ref_placeholder or "")
-                    else:
-                        ref_val = st.text_input(ref_label, key=f"md_ref_{phase}_{r_key}", placeholder=ref_placeholder or "")
                 _, _cmt_col = st.columns([1, 20])
                 with _cmt_col:
+                    if ref_label:
+                        if textarea_ref:
+                            ref_val = st.text_area(ref_label, key=f"md_ref_{phase}_{r_key}", height=60, placeholder=ref_placeholder or "")
+                        else:
+                            ref_val = st.text_input(ref_label, key=f"md_ref_{phase}_{r_key}", placeholder=ref_placeholder or "")
                     cmt_val = st.text_area(
                         "Comment (optional)", key=f"md_cmt_{phase}_{r_key}",
                         height=60, placeholder=cmt_placeholder or "Add context for downstream phases…", label_visibility="visible",
@@ -1258,9 +1293,6 @@ def phase_action_dialog():
                     f'</div>',
                     unsafe_allow_html=True,
                 )
-                if st.button("↩ DASHBOARD", key="mp4_done"):
-                    _close()
-                    st.rerun()
 
     # ══════════════════════════════════════════════════════════════════════════
     # PHASE 6 — Resourcing / Work Allocation
@@ -1347,9 +1379,6 @@ def phase_action_dialog():
                     f'</div>',
                     unsafe_allow_html=True,
                 )
-                if st.button("↩ DASHBOARD", key="mp6_done"):
-                    _close()
-                    st.rerun()
 
     # ══════════════════════════════════════════════════════════════════════════
     # PHASE 9 — NCR / Close
@@ -1485,9 +1514,6 @@ def phase_action_dialog():
                         f'</div>',
                         unsafe_allow_html=True,
                     )
-                    if st.button("↩ DASHBOARD", key="mp9_done"):
-                        _close()
-                        st.rerun()
 
         st.markdown("<br>", unsafe_allow_html=True)
         st.markdown('<hr style="border-color:#1e5068">', unsafe_allow_html=True)
@@ -1498,9 +1524,13 @@ def phase_action_dialog():
 
 # ── HEADER ────────────────────────────────────────────────────────────────────
 def header():
+    # ── Feedback dialog trigger (must be before any columns) ──────────────────
+    if st.session_state.get("show_feedback"):
+        feedback.feedback_dialog()
+
     _mode_label = "PREVIEW" if is_preview() else "DEMO"
     _mode_color = "#00d4ff" if is_preview() else "#ffc400"
-    c1, _, c3, c4 = st.columns([5, 1, 1, 1])
+    c1, _, c2, c3, c4 = st.columns([5, 0.5, 1, 1, 1])
     with c1:
         st.markdown(
             f'<div style="font-size:1.05em;color:#00f5ff;letter-spacing:0.2em;text-shadow:0 0 14px rgba(0,245,255,0.55)">'
@@ -1512,6 +1542,12 @@ def header():
             f'SESSION: <span style="color:#00d4ff">{udisp()}</span> [{role()}]</div>',
             unsafe_allow_html=True,
         )
+    with c2:
+        if st.button("✉ FEEDBACK", key="hdr_feedback"):
+            st.session_state["show_feedback"] = True
+            st.session_state.pop("_fb_submitted", None)
+            st.session_state.pop("_fb_ticket_id", None)
+            st.rerun()
     with c3:
         if st.button("⇄ SWITCH", key="hdr_switch"):
             for k, v in _DEFAULTS.items():
@@ -1895,6 +1931,7 @@ def page_dashboard():
                 else:
                     st.session_state["modal_phase"] = 1
                     st.session_state["modal_coupon_id"] = None
+                    st.rerun()
 
     # ── ROLE CONTEXT CARD ───────────────────────────────────────────────────────
     my_phases = ROLE_PHASES.get(role(), list(range(1, 10)) if is_preview() else [])

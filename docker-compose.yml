@@ -1,0 +1,32 @@
+services:
+  coupon-fab:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: coupon-fab
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    ports:
+      - "${APP_PORT:-8501}:8501"
+    volumes:
+      # Persist SQLite database across container restarts
+      - coupon-data:/app/data
+      # To mount Jira secrets, create a secrets.toml from secrets.toml.example
+      # then uncomment the line below:
+      - ./secrets.toml:/app/.streamlit/secrets.toml:ro
+    environment:
+      # Alternative: pass Jira config via env vars instead of secrets.toml
+      - JIRA_SERVER_TYPE=${JIRA_SERVER_TYPE:-}
+      - JIRA_BASE_URL=${JIRA_BASE_URL:-}
+      - JIRA_PROJECT_KEY=${JIRA_PROJECT_KEY:-}
+      - JIRA_ISSUE_TYPE=${JIRA_ISSUE_TYPE:-}
+      # Cloud auth (email + API token)
+      - JIRA_EMAIL=${JIRA_EMAIL:-}
+      - JIRA_API_TOKEN=${JIRA_API_TOKEN:-}
+      # Server auth (username + password)
+      - JIRA_USERNAME=${JIRA_USERNAME:-}
+      - JIRA_PASSWORD=${JIRA_PASSWORD:-}
+    restart: unless-stopped
+
+volumes:
+  coupon-data:

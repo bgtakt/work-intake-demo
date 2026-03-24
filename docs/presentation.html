@@ -1,0 +1,1410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Coupon Fab MTE — Project Documentation</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Merriweather:wght@400;700&display=swap');
+
+  :root {
+    --navy:      #1a3a6b;
+    --blue:      #1e5fbe;
+    --blue-lt:   #e8f0fb;
+    --teal:      #0d7f80;
+    --teal-lt:   #e6f4f4;
+    --amber:     #b45309;
+    --amber-lt:  #fef3c7;
+    --green:     #166534;
+    --green-lt:  #dcfce7;
+    --red:       #991b1b;
+    --red-lt:    #fee2e2;
+    --gray-900:  #111827;
+    --gray-700:  #374151;
+    --gray-500:  #6b7280;
+    --gray-300:  #d1d5db;
+    --gray-100:  #f3f4f6;
+    --white:     #ffffff;
+    --bg:        #f7f8fa;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--gray-900);
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 15px;
+    line-height: 1.7;
+  }
+
+  /* ── TOP BANNER ── */
+  .banner {
+    background: var(--navy);
+    color: white;
+    padding: 28px 40px 22px;
+  }
+
+  .banner-eyebrow {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #90b4e8;
+    margin-bottom: 8px;
+  }
+
+  .banner-title {
+    font-family: 'Merriweather', Georgia, serif;
+    font-size: clamp(20px, 3vw, 28px);
+    font-weight: 700;
+    color: white;
+    line-height: 1.25;
+    margin-bottom: 14px;
+  }
+
+  .banner-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 24px;
+    font-size: 13px;
+    color: #a8c4e8;
+  }
+
+  .meta-pill {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 4px;
+    padding: 3px 10px;
+    color: white;
+    font-size: 12px;
+  }
+
+  /* ── TAB NAV ── */
+  .tab-nav {
+    background: white;
+    border-bottom: 2px solid var(--gray-300);
+    display: flex;
+    padding: 0 40px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+  }
+
+  .tab-btn {
+    background: none;
+    border: none;
+    border-bottom: 3px solid transparent;
+    color: var(--gray-500);
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: -2px;
+    padding: 16px 20px 14px;
+    transition: color 0.15s, border-color 0.15s;
+    white-space: nowrap;
+  }
+
+  .tab-btn:hover { color: var(--blue); }
+
+  .tab-btn.active {
+    border-bottom-color: var(--blue);
+    color: var(--blue);
+    font-weight: 600;
+  }
+
+  /* ── LAYOUT ── */
+  .shell {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 40px 80px;
+  }
+
+  .tab-panel { display: none; padding-top: 36px; }
+  .tab-panel.active { display: block; }
+
+  /* ── SECTION ── */
+  .section { margin-bottom: 44px; }
+
+  .section-title {
+    font-family: 'Merriweather', Georgia, serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 16px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--blue-lt);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .section-title .num {
+    background: var(--navy);
+    color: white;
+    border-radius: 50%;
+    width: 26px;
+    height: 26px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  /* ── CALLOUT BOXES ── */
+  .callout {
+    border-radius: 6px;
+    padding: 14px 18px;
+    margin-bottom: 16px;
+    font-size: 14px;
+    line-height: 1.65;
+    border-left: 4px solid;
+  }
+
+  .callout.blue  { background: var(--blue-lt);  border-color: var(--blue);  color: #1e3a6e; }
+  .callout.amber { background: var(--amber-lt); border-color: var(--amber); color: #78350f; }
+  .callout.green { background: var(--green-lt); border-color: var(--green); color: #14532d; }
+  .callout.teal  { background: var(--teal-lt);  border-color: var(--teal);  color: #134e4a; }
+  .callout.red   { background: var(--red-lt);   border-color: var(--red);   color: #7f1d1d; }
+
+  .callout strong { font-weight: 600; }
+
+  /* ── PROSE ── */
+  .prose { max-width: 800px; line-height: 1.8; color: var(--gray-700); }
+  .prose p { margin-bottom: 12px; }
+
+  /* ── TABLES ── */
+  .tbl-wrap { overflow-x: auto; margin-bottom: 4px; border-radius: 6px; border: 1px solid var(--gray-300); }
+
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+
+  thead th {
+    background: var(--navy);
+    color: white;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    padding: 11px 16px;
+    text-align: left;
+    white-space: nowrap;
+  }
+
+  tbody tr { border-bottom: 1px solid var(--gray-300); }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:nth-child(even) { background: var(--gray-100); }
+  tbody tr:hover { background: var(--blue-lt); }
+
+  tbody td {
+    padding: 11px 16px;
+    vertical-align: top;
+    line-height: 1.6;
+    color: var(--gray-700);
+  }
+
+  .badge {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 4px;
+    white-space: nowrap;
+  }
+
+  .badge-blue   { background: var(--blue-lt);  color: var(--blue); }
+  .badge-navy   { background: var(--navy);     color: white; }
+  .badge-amber  { background: var(--amber-lt); color: var(--amber); }
+  .badge-green  { background: var(--green-lt); color: var(--green); }
+  .badge-teal   { background: var(--teal-lt);  color: var(--teal); }
+
+  /* ── ROLE CHIPS ── */
+  .role-chip {
+    display: inline-block;
+    background: var(--gray-100);
+    border: 1px solid var(--gray-300);
+    border-radius: 12px;
+    font-size: 11px;
+    padding: 2px 8px;
+    color: var(--gray-700);
+    margin: 2px 2px 2px 0;
+    white-space: nowrap;
+  }
+
+  /* ── VERSION CARDS ── */
+  .version-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 16px;
+  }
+
+  .version-card {
+    background: white;
+    border: 1px solid var(--gray-300);
+    border-radius: 8px;
+    padding: 20px;
+    border-top: 4px solid;
+  }
+
+  .version-card.v1  { border-top-color: var(--blue); }
+  .version-card.v15 { border-top-color: var(--teal); }
+  .version-card.v2  { border-top-color: #7c3aed; }
+
+  .version-card .vnum {
+    font-family: 'Merriweather', Georgia, serif;
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+
+  .v1  .vnum { color: var(--blue); }
+  .v15 .vnum { color: var(--teal); }
+  .v2  .vnum { color: #7c3aed; }
+
+  .version-card .vdue {
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 12px;
+  }
+
+  .v1  .vdue { color: var(--amber); }
+  .v15 .vdue { color: var(--teal); }
+  .v2  .vdue { color: var(--gray-500); }
+
+  .version-card ul {
+    list-style: none;
+    padding: 0;
+    font-size: 13px;
+    color: var(--gray-700);
+  }
+
+  .version-card li {
+    padding: 4px 0 4px 16px;
+    position: relative;
+    border-bottom: 1px solid var(--gray-100);
+  }
+
+  .version-card li:last-child { border-bottom: none; }
+
+  .version-card li::before {
+    content: '→';
+    position: absolute;
+    left: 0;
+    color: var(--gray-500);
+    font-size: 11px;
+    top: 6px;
+  }
+
+  /* ── DEMO GRID ── */
+  .demo-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .demo-card {
+    background: white;
+    border: 1px solid var(--gray-300);
+    border-radius: 6px;
+    padding: 14px 16px;
+  }
+
+  .demo-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--gray-500);
+    margin-bottom: 5px;
+  }
+
+  .demo-value { font-size: 14px; color: var(--gray-900); font-weight: 500; }
+
+  /* ── TEAM GRID ── */
+  .team-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(185px, 1fr));
+    gap: 10px;
+  }
+
+  .team-card {
+    background: white;
+    border: 1px solid var(--gray-300);
+    border-radius: 6px;
+    padding: 12px 14px;
+    border-left: 3px solid var(--blue);
+  }
+
+  .team-role {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--blue);
+    margin-bottom: 3px;
+  }
+
+  .team-name { font-size: 14px; color: var(--gray-900); }
+
+  /* ── JIRA STATUS FLOW ── */
+  .status-flow {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    padding: 14px 0;
+  }
+
+  .status-pill {
+    font-size: 12px;
+    font-weight: 500;
+    padding: 5px 12px;
+    border-radius: 20px;
+  }
+
+  .sp-todo  { background: #dbeafe; color: #1e40af; }
+  .sp-prog  { background: #fef9c3; color: #854d0e; }
+  .sp-done  { background: var(--green-lt); color: var(--green); }
+  .sp-arrow { color: var(--gray-500); font-size: 13px; }
+
+  /* ── FIELD GRID ── */
+  .field-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+    gap: 8px;
+    margin-top: 8px;
+  }
+
+  .field-item {
+    background: white;
+    border: 1px solid var(--gray-300);
+    border-radius: 4px;
+    padding: 8px 12px;
+  }
+
+  .field-name { font-size: 13px; font-weight: 500; color: var(--gray-900); }
+  .field-type { font-size: 11px; color: var(--gray-500); margin-top: 2px; }
+
+  /* ── QTNA LIST ── */
+  .qtna-list { display: flex; flex-direction: column; gap: 8px; }
+
+  .qtna-item {
+    background: white;
+    border: 1px solid var(--gray-300);
+    border-radius: 6px;
+    padding: 12px 16px;
+    font-size: 14px;
+    color: var(--gray-700);
+    border-left: 3px solid var(--amber);
+  }
+
+  /* ── Q LIST ── */
+  .q-list { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+
+  .q-item {
+    background: white;
+    border: 1px solid var(--gray-300);
+    border-radius: 6px;
+    padding: 12px 16px;
+    font-size: 14px;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+
+  .q-tag {
+    background: var(--navy);
+    color: white;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 7px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  /* ── KNOWLEDGE BASE ── */
+  .kb-step {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 20px;
+    align-items: flex-start;
+  }
+
+  .kb-step-num {
+    background: var(--blue);
+    color: white;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+
+  .kb-step-body { flex: 1; }
+  .kb-step-body h4 { font-size: 15px; font-weight: 600; color: var(--gray-900); margin-bottom: 4px; }
+  .kb-step-body p  { font-size: 14px; color: var(--gray-700); }
+
+  .role-guide-card {
+    background: white;
+    border: 1px solid var(--gray-300);
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+
+  .role-guide-card h4 {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .role-guide-card .phases-row {
+    font-size: 12px;
+    color: var(--gray-500);
+    margin-bottom: 12px;
+  }
+
+  .role-guide-card ol {
+    padding-left: 18px;
+    font-size: 14px;
+    color: var(--gray-700);
+    line-height: 1.8;
+  }
+
+  .use-case-card {
+    background: white;
+    border: 1px solid var(--gray-300);
+    border-radius: 8px;
+    padding: 24px;
+    margin-bottom: 20px;
+  }
+
+  .use-case-card h4 {
+    font-family: 'Merriweather', Georgia, serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 6px;
+  }
+
+  .use-case-card .scenario-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--teal);
+    margin-bottom: 10px;
+  }
+
+  .use-case-card p { font-size: 14px; color: var(--gray-700); margin-bottom: 10px; }
+
+  .use-case-steps {
+    list-style: none;
+    padding: 0;
+    margin: 10px 0;
+  }
+
+  .use-case-steps li {
+    font-size: 14px;
+    color: var(--gray-700);
+    padding: 6px 0 6px 28px;
+    position: relative;
+    border-bottom: 1px solid var(--gray-100);
+  }
+
+  .use-case-steps li:last-child { border-bottom: none; }
+
+  .use-case-steps li::before {
+    content: attr(data-step);
+    position: absolute;
+    left: 0;
+    background: var(--blue);
+    color: white;
+    font-size: 10px;
+    font-weight: 700;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    top: 9px;
+  }
+
+  .example-box {
+    background: var(--teal-lt);
+    border: 1px solid #99d1d1;
+    border-radius: 6px;
+    padding: 12px 16px;
+    font-size: 13px;
+    color: #134e4a;
+    margin-top: 12px;
+  }
+
+  .example-box strong { font-weight: 600; color: var(--teal); }
+
+  /* ── CRED TABLE ── */
+  .cred-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    border: 1px solid var(--gray-300);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  .cred-table th {
+    background: var(--navy);
+    color: white;
+    padding: 10px 14px;
+    text-align: left;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+  }
+
+  .cred-table td {
+    padding: 9px 14px;
+    border-bottom: 1px solid var(--gray-300);
+    color: var(--gray-700);
+  }
+
+  .cred-table tr:last-child td { border-bottom: none; }
+  .cred-table tr:nth-child(even) td { background: var(--gray-100); }
+
+  .cred-table .un {
+    font-family: 'Courier New', monospace;
+    font-weight: 600;
+    color: var(--blue);
+  }
+
+  .cred-table .pw {
+    font-family: 'Courier New', monospace;
+    background: var(--gray-100);
+    padding: 1px 6px;
+    border-radius: 3px;
+    font-size: 13px;
+  }
+
+  /* ── LINKS ── */
+  a { color: var(--blue); }
+  a:hover { color: var(--navy); }
+
+  /* ── FOOTER ── */
+  .footer {
+    background: var(--navy);
+    color: #90b4e8;
+    text-align: center;
+    padding: 18px 40px;
+    font-size: 12px;
+    margin-top: 20px;
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 700px) {
+    .shell { padding: 0 16px 60px; }
+    .banner { padding: 20px 16px 16px; }
+    .tab-nav { padding: 0 8px; }
+    .tab-btn { padding: 14px 10px 12px; font-size: 13px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- BANNER -->
+<header class="banner">
+  <div class="banner-eyebrow">MTE Manufacturing Execution System</div>
+  <h1 class="banner-title">Coupon Fab Workflow Prototype — Project Documentation</h1>
+  <div class="banner-meta">
+    <span class="meta-pill">Meeting: Mon / Thu 2:30 PM</span>
+    <span class="meta-pill">Chris mobile: 657-791-0800</span>
+    <span class="meta-pill">Demo Date: Friday, March 20</span>
+  </div>
+</header>
+
+<!-- TAB NAV -->
+<nav class="tab-nav">
+  <button class="tab-btn active" onclick="switchTab('overview', this)">Project Overview</button>
+  <button class="tab-btn" onclick="switchTab('process', this)">Process Documentation</button>
+  <button class="tab-btn" onclick="switchTab('howto', this)">How-To Guide &amp; Knowledge Base</button>
+</nav>
+
+<div class="shell">
+
+<!-- ═══════════════════════════════════════════════
+     TAB 1 — PROJECT OVERVIEW
+═══════════════════════════════════════════════ -->
+<div id="tab-overview" class="tab-panel active">
+
+  <div class="section">
+    <h2 class="section-title"><span class="num">1</span>Big Picture</h2>
+    <div class="callout blue">
+      <strong>What we're building:</strong> A custom manufacturing execution system for submarine coupon fabrication — a prototype that replaces a fragmented stack of tools (Teamcenter, Oracle, Forge, spreadsheets) with a single lightweight system we control. The goal: avoid enterprise configuration hell and ship something real for a protofactory environment.
+    </div>
+    <div class="callout amber">
+      <strong>This is not a research project.</strong> We demo V1 to manufacturing partners Friday March 20.
+    </div>
+    <div class="prose">
+      <p><strong>Role split for the demo:</strong> ---- ----- operates the process as the user. You build the system. At the demo, Hector clicks through the workflow while you present.</p>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title"><span class="num">2</span>Development Sequence</h2>
+    <div class="version-grid">
+      <div class="version-card v1">
+        <div class="vnum">V1</div>
+        <div class="vdue">Due: Friday, March 20 — Static Forms</div>
+        <ul>
+          <li>Tron-style workflow visualization showing all 9 phases</li>
+          <li>Static forms at each node; user fills out, submits, advances</li>
+          <li>Jira integration (submit/update from Jira MTE)</li>
+          <li>Runs locally, browser-accessible, user/password login</li>
+          <li>No proprietary data; all personas represented</li>
+          <li>Tech stack TBD — bring your recommendation to first meeting</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title"><span class="num">3</span>The 9-Phase Process</h2>
+    <div style="background:#0a1520;border-radius:6px;overflow-x:auto;padding:14px 12px 10px;margin-bottom:16px;">
+      <svg viewBox="0 0 900 225" xmlns="http://www.w3.org/2000/svg" style="width:100%;min-width:580px;display:block;">
+        <defs>
+          <marker id="p-arr" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
+            <path d="M0,0.5 L0,6.5 L6.5,3.5 z" fill="#00d4ff"/>
+          </marker>
+          <filter id="p-glow" x="-30%" y="-30%" width="160%" height="160%">
+            <feGaussianBlur stdDeviation="3" result="b"/>
+            <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+        </defs>
+        <line x1="100" y1="111" x2="122" y2="111" stroke="#00d4ff" stroke-width="1.5" marker-end="url(#p-arr)"/>
+        <line x1="220" y1="111" x2="242" y2="111" stroke="#00d4ff" stroke-width="1.5" marker-end="url(#p-arr)"/>
+        <path d="M340,111 C368,111 398,44 407,44"   stroke="#00d4ff" stroke-width="1.5" fill="none" marker-end="url(#p-arr)"/>
+        <line x1="340" y1="111" x2="407" y2="111"   stroke="#00d4ff" stroke-width="1.5" marker-end="url(#p-arr)"/>
+        <path d="M340,111 C368,111 398,178 407,178"  stroke="#00d4ff" stroke-width="1.5" fill="none" marker-end="url(#p-arr)"/>
+        <line x1="505" y1="44"  x2="532" y2="44"    stroke="#00d4ff" stroke-width="1.5" marker-end="url(#p-arr)"/>
+        <path d="M630,44  C652,44  656,78  652,103"  stroke="#00d4ff" stroke-width="1.5" fill="none" marker-end="url(#p-arr)"/>
+        <line x1="505" y1="111" x2="652" y2="111"   stroke="#00d4ff" stroke-width="1.5" marker-end="url(#p-arr)"/>
+        <path d="M505,178 C578,178 644,148 652,119"  stroke="#00d4ff" stroke-width="1.5" fill="none" marker-end="url(#p-arr)"/>
+        <line x1="765" y1="111" x2="782" y2="111"   stroke="#00d4ff" stroke-width="1.5" marker-end="url(#p-arr)"/>
+        <rect x="10"  y="87"  width="90"  height="48" rx="4" fill="rgba(0,212,255,0.06)" stroke="#00d4ff" stroke-width="1.5"/>
+        <text x="55"  y="108" text-anchor="middle" fill="#4aaccc" font-size="8.5" font-family="monospace" letter-spacing="1">PHASE 1</text>
+        <text x="55"  y="124" text-anchor="middle" fill="#c0d8e0" font-size="11"  font-family="monospace">Initiate</text>
+        <rect x="130" y="87"  width="90"  height="48" rx="4" fill="rgba(0,212,255,0.06)" stroke="#00d4ff" stroke-width="1.5"/>
+        <text x="175" y="108" text-anchor="middle" fill="#4aaccc" font-size="8.5" font-family="monospace" letter-spacing="1">PHASE 2</text>
+        <text x="175" y="124" text-anchor="middle" fill="#c0d8e0" font-size="11"  font-family="monospace">Align</text>
+        <circle cx="220" cy="135" r="9" fill="#00d4ff"/><text x="220" y="139" text-anchor="middle" fill="#0a1520" font-size="9" font-family="monospace" font-weight="bold">3</text>
+        <rect x="250" y="87"  width="90"  height="48" rx="4" fill="rgba(0,212,255,0.06)" stroke="#00d4ff" stroke-width="1.5"/>
+        <text x="295" y="108" text-anchor="middle" fill="#4aaccc" font-size="8.5" font-family="monospace" letter-spacing="1">PHASE 3</text>
+        <text x="295" y="124" text-anchor="middle" fill="#c0d8e0" font-size="11"  font-family="monospace">Design</text>
+        <circle cx="340" cy="135" r="9" fill="#00d4ff"/><text x="340" y="139" text-anchor="middle" fill="#0a1520" font-size="9" font-family="monospace" font-weight="bold">2</text>
+        <rect x="415" y="20"  width="90"  height="48" rx="4" fill="rgba(0,212,255,0.06)" stroke="#00d4ff" stroke-width="1.5"/>
+        <text x="460" y="41"  text-anchor="middle" fill="#4aaccc" font-size="8.5" font-family="monospace" letter-spacing="1">PHASE 4</text>
+        <text x="460" y="57"  text-anchor="middle" fill="#c0d8e0" font-size="11"  font-family="monospace">Procure</text>
+        <circle cx="505" cy="68"  r="9" fill="#00d4ff"/><text x="505" y="72"  text-anchor="middle" fill="#0a1520" font-size="9" font-family="monospace" font-weight="bold">3</text>
+        <rect x="415" y="87"  width="90"  height="48" rx="4" fill="rgba(0,212,255,0.06)" stroke="#00d4ff" stroke-width="1.5"/>
+        <text x="460" y="108" text-anchor="middle" fill="#4aaccc" font-size="8.5" font-family="monospace" letter-spacing="1">PHASE 5</text>
+        <text x="460" y="124" text-anchor="middle" fill="#c0d8e0" font-size="11"  font-family="monospace">Work Inst</text>
+        <circle cx="505" cy="135" r="9" fill="#00d4ff"/><text x="505" y="139" text-anchor="middle" fill="#0a1520" font-size="9" font-family="monospace" font-weight="bold">4</text>
+        <rect x="415" y="154" width="90"  height="48" rx="4" fill="rgba(0,212,255,0.06)" stroke="#00d4ff" stroke-width="1.5"/>
+        <text x="460" y="175" text-anchor="middle" fill="#4aaccc" font-size="8.5" font-family="monospace" letter-spacing="1">PHASE 6</text>
+        <text x="460" y="191" text-anchor="middle" fill="#c0d8e0" font-size="11"  font-family="monospace">Resource</text>
+        <circle cx="505" cy="202" r="9" fill="#00d4ff"/><text x="505" y="206" text-anchor="middle" fill="#0a1520" font-size="9" font-family="monospace" font-weight="bold">1</text>
+        <rect x="540" y="20"  width="90"  height="48" rx="4" fill="rgba(0,212,255,0.06)" stroke="#00d4ff" stroke-width="1.5"/>
+        <text x="585" y="41"  text-anchor="middle" fill="#4aaccc" font-size="8.5" font-family="monospace" letter-spacing="1">PHASE 7</text>
+        <text x="585" y="57"  text-anchor="middle" fill="#c0d8e0" font-size="11"  font-family="monospace">Receiving</text>
+        <circle cx="630" cy="68"  r="9" fill="#00d4ff"/><text x="630" y="72"  text-anchor="middle" fill="#0a1520" font-size="9" font-family="monospace" font-weight="bold">1</text>
+        <rect x="660" y="87"  width="105" height="48" rx="4" fill="rgba(0,245,255,0.09)" stroke="#00f5ff" stroke-width="2.5" filter="url(#p-glow)"/>
+        <text x="712" y="108" text-anchor="middle" fill="#4aaccc" font-size="8.5" font-family="monospace" letter-spacing="1">PHASE 8</text>
+        <text x="712" y="125" text-anchor="middle" fill="#00f5ff" font-size="12"  font-family="monospace" font-weight="bold">EXECUTE</text>
+        <rect x="790" y="87"  width="90"  height="48" rx="4" fill="rgba(0,212,255,0.06)" stroke="#00d4ff" stroke-width="1.5"/>
+        <text x="835" y="108" text-anchor="middle" fill="#4aaccc" font-size="8.5" font-family="monospace" letter-spacing="1">PHASE 9</text>
+        <text x="835" y="124" text-anchor="middle" fill="#c0d8e0" font-size="11"  font-family="monospace">NCR</text>
+      </svg>
+    </div>
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr><th>Phase</th><th>Description</th><th>Roles Involved</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="badge badge-blue">Phase 1</span></td>
+            <td>Initiate design request — NX model + TC engineering item</td>
+            <td><span class="role-chip">Stakeholder</span><span class="role-chip">DE</span><span class="role-chip">ME</span><span class="role-chip">Weld Engineer</span></td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-blue">Phase 2</span></td>
+            <td>Align on design, fab, mfg processes</td>
+            <td><span class="role-chip">DE</span><span class="role-chip">ME</span><span class="role-chip">Weld Engineer</span></td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-blue">Phase 3</span></td>
+            <td>DE creates NX design + TC EBOM</td>
+            <td><span class="role-chip">DE</span></td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-blue">Phase 4</span></td>
+            <td>Procurement / scheduling — PR/RFQ/PO</td>
+            <td><span class="role-chip">Supply Chain</span></td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-blue">Phase 5</span></td>
+            <td>Work instructions — fab/assembly/quality</td>
+            <td><span class="role-chip">ME</span><span class="role-chip">Weld Engineer</span><span class="role-chip">QE</span></td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-blue">Phase 6</span></td>
+            <td>Resourcing / work allocation</td>
+            <td><span class="role-chip">IE</span></td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-blue">Phase 7</span></td>
+            <td>Material receiving</td>
+            <td><span class="role-chip">Supply Chain</span><span class="role-chip">QE</span><span class="role-chip">Warehouse/MMO</span></td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-navy">Phase 8 ★</span></td>
+            <td><strong>WORK EXECUTION — all branches converge</strong></td>
+            <td><span class="role-chip">Mechanic</span><span class="role-chip">ME</span><span class="role-chip">QE</span></td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-blue">Phase 9</span></td>
+            <td>Non-conformance (NCR)</td>
+            <td><span class="role-chip">QE</span><span class="role-chip">ME</span><span class="role-chip">Mechanic</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title"><span class="num">4</span>All Personas — Show in V1</h2>
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr><th>Persona</th><th>Active Phases</th><th>Responsibility</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Stakeholder</td><td><span class="badge badge-blue">1</span></td><td>Approves intake / sets priority</td></tr>
+          <tr><td>DE (Design Engineer)</td><td><span class="badge badge-blue">1</span> <span class="badge badge-blue">2</span> <span class="badge badge-blue">3</span></td><td>NX design, TC EBOM creation</td></tr>
+          <tr><td>ME (Manufacturing Engineer)</td><td><span class="badge badge-blue">1</span> <span class="badge badge-blue">2</span> <span class="badge badge-blue">3</span> <span class="badge badge-blue">5</span></td><td>MBOM, bill of process, work instructions</td></tr>
+          <tr><td>Weld Engineer</td><td><span class="badge badge-blue">1</span> <span class="badge badge-blue">2</span> <span class="badge badge-blue">5</span></td><td>Welding process definition</td></tr>
+          <tr><td>Supply Chain</td><td><span class="badge badge-blue">4</span> <span class="badge badge-blue">7</span></td><td>PR/RFQ/PO, material receiving</td></tr>
+          <tr><td>IE (Industrial Engineer)</td><td><span class="badge badge-blue">6</span></td><td>Scheduling, work allocation</td></tr>
+          <tr><td>QE (Quality Engineer)</td><td><span class="badge badge-blue">5</span> <span class="badge badge-blue">7</span> <span class="badge badge-blue">8</span> <span class="badge badge-blue">9</span></td><td>Inspection plans, NCR disposition</td></tr>
+          <tr><td>Warehouse / MMO</td><td><span class="badge badge-blue">7</span></td><td>Material warehousing</td></tr>
+          <tr><td>Mechanic (Mfg Tech)</td><td><span class="badge badge-navy">8 ★</span></td><td>Executes work plan, redlines</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title"><span class="num">5</span>V1 Deliverable Spec</h2>
+    <div class="callout blue" style="margin-bottom:16px">
+      <strong>Visual:</strong> Tron-style — dark background, cyan/electric blue glows, monospace type, no pink. MECHANIC node at convergence. Each node clickable. Arrow key navigation. Localhost with user/password login.
+    </div>
+    <h3 style="font-size:14px;font-weight:700;color:var(--navy);margin-bottom:10px;">Forms</h3>
+    <ul style="padding-left:20px;font-size:14px;color:var(--gray-700);line-height:2;margin-bottom:20px;">
+      <li><strong>Phase 1:</strong> Input form with amber gap highlighting. Submit advances to Phase 2.</li>
+      <li><strong>Phase 2:</strong> Multi-role approval/sign-off. Confirmation step, not data entry.</li>
+      <li><strong>Phase 3:</strong> DE confirms completion, attaches TC item reference.</li>
+    </ul>
+    <h3 style="font-size:14px;font-weight:700;color:var(--navy);margin-bottom:10px;">Integration &amp; Stack</h3>
+    <ul style="padding-left:20px;font-size:14px;color:var(--gray-700);line-height:2;">
+      <li><strong>Jira integration (required for V1):</strong> Reads/writes Jira MTE project. Project key: MTE.</li>
+      <li><strong>Suggested tech stack:</strong> Python + Streamlit + SQLite. Bring your recommendation.</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title"><span class="num">6</span>Demo Plan — Friday, March 20</h2>
+    <div class="demo-grid">
+      <div class="demo-card"><div class="demo-label">Presenter</div><div class="demo-value">Ben</div></div>
+      <div class="demo-card"><div class="demo-label">Operator</div><div class="demo-value">---- -----</div></div>
+      <div class="demo-card"><div class="demo-label">Audience</div><div class="demo-value">Full manufacturing team — all personas</div></div>
+      <div class="demo-card"><div class="demo-label">Scope</div><div class="demo-value">Phases 1–3 minimum; full visualization shown</div></div>
+    </div>
+    <div class="callout amber">No proprietary information in the demo.</div>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title"><span class="num">7</span>Questions for First Meeting</h2>
+    <p style="font-size:14px;color:var(--gray-700);margin-bottom:12px;">Come with everything you're uncertain about. Key areas:</p>
+    <ul class="q-list">
+      <li class="q-item"><span class="q-tag">Q1</span><span>What stack for V1? <span style="color:var(--gray-500)">(Candidate: Python + Streamlit + SQLite)</span></span></li>
+      <li class="q-item"><span class="q-tag">Q2</span><span>Jira MTE workflow statuses? <span style="color:var(--gray-500)">(Candidate: New Request → In Design → Eng. Definition → Procurement → Instructions → Resourcing → Receiving → Execution → Closed)</span></span></li>
+      <li class="q-item"><span class="q-tag">Q3</span><span>Do I need real Jira access for V1? <span style="color:var(--gray-500)">(Candidate: No — mock the API responses)</span></span></li>
+      <li class="q-item"><span class="q-tag">Q4</span><span>Login credentials for V1 demo? <span style="color:var(--gray-500)">(Candidate: Hardcoded admin/demo)</span></span></li>
+      <li class="q-item"><span class="q-tag">Q6</span><span>Box folder access: <a href="https://anduril.box.com/s/13j70p9iyt5yg1l4jl6kfz463idkpfo7" target="_blank">anduril.box.com/s/13j70p9iyt5yg1l4jl6kfz463idkpfo7</a></span></li>
+    </ul>
+    <div class="callout amber" style="margin-top:16px;">Note on Quip access: You will receive a Quip invite — watch for it.</div>
+  </div>
+
+</div><!-- /tab-overview -->
+
+
+<!-- ═══════════════════════════════════════════════
+     TAB 2 — PROCESS DOCUMENTATION
+═══════════════════════════════════════════════ -->
+<div id="tab-process" class="tab-panel">
+
+  <div class="section">
+    <h2 class="section-title"><span class="num">1</span>Integrated Team</h2>
+    <div class="team-grid">
+      <div class="team-card"><div class="team-role">Stakeholders</div><div class="team-name">Jeff / Shane</div></div>      
+      <div class="team-card"><div class="team-role">DE</div><div class="team-name">Norm / Ryan</div></div>
+      <div class="team-card"><div class="team-role">ME</div><div class="team-name">Maya</div></div>
+      <div class="team-card"><div class="team-role">Weld Engineer</div><div class="team-name">Shawn</div></div>
+      <div class="team-card"><div class="team-role">Quality</div><div class="team-name">Nouteng</div></div>
+      <div class="team-card"><div class="team-role">Inspection</div><div class="team-name">Alfredo</div></div>
+      <div class="team-card"><div class="team-role">IE</div><div class="team-name">Chris</div></div>
+      <div class="team-card"><div class="team-role">Supply Chain</div><div class="team-name">Rohit</div></div>
+      <div class="team-card"><div class="team-role">Mfg Ops</div><div class="team-name">Chad / Ryan / Rick</div></div>
+      <div class="team-card"><div class="team-role">Warehouse / MMO</div><div class="team-name">Rick</div></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title"><span class="num">2</span>Process Phases</h2>
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Process Phase</th>
+            <th>Process Description</th>
+            <th>Outputs</th>
+            <th>Process Owner</th>
+            <th>Standard Software</th>
+            <th>Notes / Comments</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>IDEATION / REQUEST / NPI</strong></td>
+            <td>Initiate a request to Design for NX model build and teamcenter engineering item creation. ME/DE/Welding Engineer leads align on design, fab, mfg processes (high level) to support design creation.</td>
+            <td>For first couple iterations, the output should be an intake form we can use.</td>
+            <td>CHENG + DE/ME/Welding Eng</td>
+            <td style="color:var(--gray-500)">—</td>
+            <td>CCB0 or other relevant intake process to provide clarity on intent &amp; priority. Maya Robinson to align ME lead.</td>
+          </tr>
+          <tr>
+            <td><strong>DESIGN</strong></td>
+            <td>DE design creation in NX &amp; engineering item (EBOM) creation in TC. Design approval routings. MFG State CAD. Design equipment/tooling.</td>
+            <td>ENG Part Number. ENG Item created. Released EBOM.</td>
+            <td>DESIGN + EquipEng &amp; ME</td>
+            <td>NX / Teamcenter</td>
+            <td style="color:var(--gray-500)">—</td>
+          </tr>
+          <tr>
+            <td><strong>ENG DEFINITION</strong></td>
+            <td>ME create mfg items (MBOM) in TC &amp; Bill of Process. Create routings.</td>
+            <td>MFG Part Number. MFG item release. Released MBOM &amp; BOP.</td>
+            <td>ME</td>
+            <td>Teamcenter</td>
+            <td style="color:var(--gray-500)">—</td>
+          </tr>
+          <tr>
+            <td><strong>PROCUREMENT / SCHEDULING</strong></td>
+            <td>Identify, onboard, audit supplier. Build PR, RFQ, Get quote. Issue PO.</td>
+            <td>PO issued. Delivery ETA.</td>
+            <td>Supply Chain</td>
+            <td>Oracle</td>
+            <td>Need to align this to TC items and workflow.</td>
+          </tr>
+          <tr>
+            <td><strong>WORK INSTRUCTIONS</strong></td>
+            <td>Create work instructions — for Fab/Assy/Quality Inspect. Concurrence from relevant engineering disciplines.</td>
+            <td>Executable work plans in Forge.</td>
+            <td>ME + Weld Engineer (as consultant/reference) + Equipment &amp; tooling engineer + Quality/Inspection engineer</td>
+            <td>FORGE / Easy Plan?</td>
+            <td style="color:var(--gray-500)">—</td>
+          </tr>
+          <tr>
+            <td><strong>RESOURCING / WORK ALLOCATION</strong></td>
+            <td>Standard Routings. Adjusted Work scheduling &amp; assignment (jobs, tooling, machinery, material availability, etc.)</td>
+            <td>Mfg schedule.</td>
+            <td>IE</td>
+            <td>Vulcan?? Deckplate! :)</td>
+            <td>Constraint network?</td>
+          </tr>
+          <tr>
+            <td><strong>MATERIAL RECEIVING</strong></td>
+            <td>Receiving Instructions. Quality check. Warehousing.</td>
+            <td>Material stored and ready for install.</td>
+            <td>Supply Chain + Quality + Mfg Ops</td>
+            <td style="color:var(--gray-500)">—</td>
+            <td style="color:var(--gray-500)">—</td>
+          </tr>
+          <tr>
+            <td><strong style="color:var(--navy)">WORK EXECUTION ★</strong></td>
+            <td>Execute work plan. Redlining, process updates, etc.</td>
+            <td>Work buy off in Forge. Redlines documented in Forge.</td>
+            <td>Mfg Tech + ME + Quality</td>
+            <td>Forge</td>
+            <td style="color:var(--gray-500)">—</td>
+          </tr>
+          <tr>
+            <td><strong>NON CONFORMANCE, HELP NEEDED, PROCESS DEVIATIONS</strong></td>
+            <td>Dispositions / resolutions / ME routing. Shop concurrence.</td>
+            <td style="color:var(--gray-500)">—</td>
+            <td>QE/QI + ME (Planning + MRB) + Mfg Tech</td>
+            <td>FRACAS / Forge / FLAG</td>
+            <td style="color:var(--gray-500)">—</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title"><span class="num">3</span>Questions to Note / Actions (QTNA)</h2>
+    <div class="qtna-list">
+      <div class="qtna-item">After Action Reviews — need to incorporate this.</div>
+      <div class="qtna-item">Should we apply the ECN process for new fab processes? This would in theory give traceability of changes.</div>
+      <div class="qtna-item">How do we know when we are "kitted enough" to pull work forward? This should tie into deckplate/loki deliverables.</div>
+      <div class="qtna-item"><strong>Do we need a new project in TC?</strong> Yes — Maya Robinson have McKenna create new project for Heavy Metal Coupon and Fab Dev.</div>
+      <div class="qtna-item">Coupons &amp; TTube Jeff Work.</div>
+      <div class="qtna-item">Is there a list of required information for engineering item creation? Need to create something for this.</div>
+      <div class="qtna-item">Can you release eng items without having mfg items tied to them?</div>
+      <div class="qtna-item">For new procedures note, we have a different org structure &amp; process owners.</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title"><span class="num">4</span>Jira Setup Request</h2>
+    <p style="font-size:14px;color:var(--gray-700);margin-bottom:16px;">
+      <strong>Project URL:</strong> <a href="https://jira.anduril.dev/projects/MTE/summary" target="_blank">jira.anduril.dev/projects/MTE/summary</a><br>
+      Our team is setting up a new manufacturing process in the MTE project, and we need some new Jira components to support it. The default setup doesn't capture the data or the process we need for our work.
+    </p>
+
+    <div style="background:white;border:1px solid var(--gray-300);border-radius:8px;padding:20px;margin-bottom:16px;">
+      <h3 style="font-size:14px;font-weight:700;color:var(--navy);margin-bottom:14px;">1 — New Statuses</h3>
+      <div style="background:#0a1520;border-radius:6px;overflow-x:auto;padding:14px 12px 10px;">
+        <svg viewBox="0 0 900 225" xmlns="http://www.w3.org/2000/svg" style="width:100%;min-width:580px;display:block;">
+          <defs>
+            <marker id="j-arr" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
+              <path d="M0,0.5 L0,6.5 L6.5,3.5 z" fill="#00d4ff"/>
+            </marker>
+            <filter id="j-glow" x="-30%" y="-30%" width="160%" height="160%">
+              <feGaussianBlur stdDeviation="3" result="b"/>
+              <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+          </defs>
+          <!-- ARROWS drawn first so boxes appear on top -->
+          <line x1="100" y1="111" x2="122" y2="111" stroke="#00d4ff" stroke-width="1.5" marker-end="url(#j-arr)"/>
+          <line x1="220" y1="111" x2="242" y2="111" stroke="#00d4ff" stroke-width="1.5" marker-end="url(#j-arr)"/>
+          <path d="M340,111 C368,111 398,44 407,44"   stroke="#00d4ff" stroke-width="1.5" fill="none" marker-end="url(#j-arr)"/>
+          <line x1="340" y1="111" x2="407" y2="111"   stroke="#00d4ff" stroke-width="1.5" marker-end="url(#j-arr)"/>
+          <path d="M340,111 C368,111 398,178 407,178"  stroke="#00d4ff" stroke-width="1.5" fill="none" marker-end="url(#j-arr)"/>
+          <line x1="505" y1="44"  x2="532" y2="44"    stroke="#00d4ff" stroke-width="1.5" marker-end="url(#j-arr)"/>
+          <path d="M630,44  C652,44  656,78  652,103"  stroke="#00d4ff" stroke-width="1.5" fill="none" marker-end="url(#j-arr)"/>
+          <line x1="505" y1="111" x2="652" y2="111"   stroke="#00d4ff" stroke-width="1.5" marker-end="url(#j-arr)"/>
+          <path d="M505,178 C578,178 644,148 652,119"  stroke="#00d4ff" stroke-width="1.5" fill="none" marker-end="url(#j-arr)"/>
+          <line x1="765" y1="111" x2="782" y2="111"   stroke="#00d4ff" stroke-width="1.5" marker-end="url(#j-arr)"/>
+          <!-- PHASE BOXES -->
+          <rect x="10"  y="87"  width="90"  height="48" rx="4" fill="rgba(0,212,255,0.06)" stroke="#00d4ff" stroke-width="1.5"/>
+          <text x="55"  y="108" text-anchor="middle" fill="#4aaccc" font-size="8.5" font-family="monospace" letter-spacing="1">PHASE 1</text>
+          <text x="55"  y="124" text-anchor="middle" fill="#c0d8e0" font-size="11"  font-family="monospace">Initiate</text>
+          <rect x="130" y="87"  width="90"  height="48" rx="4" fill="rgba(0,212,255,0.06)" stroke="#00d4ff" stroke-width="1.5"/>
+          <text x="175" y="108" text-anchor="middle" fill="#4aaccc" font-size="8.5" font-family="monospace" letter-spacing="1">PHASE 2</text>
+          <text x="175" y="124" text-anchor="middle" fill="#c0d8e0" font-size="11"  font-family="monospace">Align</text>
+          <circle cx="220" cy="135" r="9" fill="#00d4ff"/><text x="220" y="139" text-anchor="middle" fill="#0a1520" font-size="9" font-family="monospace" font-weight="bold">3</text>
+          <rect x="250" y="87"  width="90"  height="48" rx="4" fill="rgba(0,212,255,0.06)" stroke="#00d4ff" stroke-width="1.5"/>
+          <text x="295" y="108" text-anchor="middle" fill="#4aaccc" font-size="8.5" font-family="monospace" letter-spacing="1">PHASE 3</text>
+          <text x="295" y="124" text-anchor="middle" fill="#c0d8e0" font-size="11"  font-family="monospace">Design</text>
+          <circle cx="340" cy="135" r="9" fill="#00d4ff"/><text x="340" y="139" text-anchor="middle" fill="#0a1520" font-size="9" font-family="monospace" font-weight="bold">2</text>
+          <rect x="415" y="20"  width="90"  height="48" rx="4" fill="rgba(0,212,255,0.06)" stroke="#00d4ff" stroke-width="1.5"/>
+          <text x="460" y="41"  text-anchor="middle" fill="#4aaccc" font-size="8.5" font-family="monospace" letter-spacing="1">PHASE 4</text>
+          <text x="460" y="57"  text-anchor="middle" fill="#c0d8e0" font-size="11"  font-family="monospace">Procure</text>
+          <circle cx="505" cy="68"  r="9" fill="#00d4ff"/><text x="505" y="72"  text-anchor="middle" fill="#0a1520" font-size="9" font-family="monospace" font-weight="bold">3</text>
+          <rect x="415" y="87"  width="90"  height="48" rx="4" fill="rgba(0,212,255,0.06)" stroke="#00d4ff" stroke-width="1.5"/>
+          <text x="460" y="108" text-anchor="middle" fill="#4aaccc" font-size="8.5" font-family="monospace" letter-spacing="1">PHASE 5</text>
+          <text x="460" y="124" text-anchor="middle" fill="#c0d8e0" font-size="11"  font-family="monospace">Work Inst</text>
+          <circle cx="505" cy="135" r="9" fill="#00d4ff"/><text x="505" y="139" text-anchor="middle" fill="#0a1520" font-size="9" font-family="monospace" font-weight="bold">4</text>
+          <rect x="415" y="154" width="90"  height="48" rx="4" fill="rgba(0,212,255,0.06)" stroke="#00d4ff" stroke-width="1.5"/>
+          <text x="460" y="175" text-anchor="middle" fill="#4aaccc" font-size="8.5" font-family="monospace" letter-spacing="1">PHASE 6</text>
+          <text x="460" y="191" text-anchor="middle" fill="#c0d8e0" font-size="11"  font-family="monospace">Resource</text>
+          <circle cx="505" cy="202" r="9" fill="#00d4ff"/><text x="505" y="206" text-anchor="middle" fill="#0a1520" font-size="9" font-family="monospace" font-weight="bold">1</text>
+          <rect x="540" y="20"  width="90"  height="48" rx="4" fill="rgba(0,212,255,0.06)" stroke="#00d4ff" stroke-width="1.5"/>
+          <text x="585" y="41"  text-anchor="middle" fill="#4aaccc" font-size="8.5" font-family="monospace" letter-spacing="1">PHASE 7</text>
+          <text x="585" y="57"  text-anchor="middle" fill="#c0d8e0" font-size="11"  font-family="monospace">Receiving</text>
+          <circle cx="630" cy="68"  r="9" fill="#00d4ff"/><text x="630" y="72"  text-anchor="middle" fill="#0a1520" font-size="9" font-family="monospace" font-weight="bold">1</text>
+          <rect x="660" y="87"  width="105" height="48" rx="4" fill="rgba(0,245,255,0.09)" stroke="#00f5ff" stroke-width="2.5" filter="url(#j-glow)"/>
+          <text x="712" y="108" text-anchor="middle" fill="#4aaccc" font-size="8.5" font-family="monospace" letter-spacing="1">PHASE 8</text>
+          <text x="712" y="125" text-anchor="middle" fill="#00f5ff" font-size="12"  font-family="monospace" font-weight="bold">EXECUTE</text>
+          <rect x="790" y="87"  width="90"  height="48" rx="4" fill="rgba(0,212,255,0.06)" stroke="#00d4ff" stroke-width="1.5"/>
+          <text x="835" y="108" text-anchor="middle" fill="#4aaccc" font-size="8.5" font-family="monospace" letter-spacing="1">PHASE 9</text>
+          <text x="835" y="124" text-anchor="middle" fill="#c0d8e0" font-size="11"  font-family="monospace">NCR</text>
+        </svg>
+        <div style="display:flex;flex-wrap:wrap;align-items:center;gap:4px;margin-top:10px;padding-top:8px;border-top:1px solid rgba(0,212,255,0.1);">
+          <span style="font-size:11px;background:rgba(0,212,255,0.12);border:1px solid rgba(0,212,255,0.3);color:#90c8e0;padding:3px 9px;border-radius:12px">New Request</span><span style="color:#2a6a80;font-size:11px">→</span>
+          <span style="font-size:11px;background:rgba(0,212,255,0.07);border:1px solid rgba(0,212,255,0.2);color:#90c8e0;padding:3px 9px;border-radius:12px">In Design</span><span style="color:#2a6a80;font-size:11px">→</span>
+          <span style="font-size:11px;background:rgba(0,212,255,0.07);border:1px solid rgba(0,212,255,0.2);color:#90c8e0;padding:3px 9px;border-radius:12px">Eng. Definition</span><span style="color:#2a6a80;font-size:11px">→</span>
+          <span style="font-size:11px;background:rgba(0,212,255,0.07);border:1px solid rgba(0,212,255,0.2);color:#90c8e0;padding:3px 9px;border-radius:12px">Procurement</span><span style="color:#2a6a80;font-size:11px">→</span>
+          <span style="font-size:11px;background:rgba(0,212,255,0.07);border:1px solid rgba(0,212,255,0.2);color:#90c8e0;padding:3px 9px;border-radius:12px">Instructions</span><span style="color:#2a6a80;font-size:11px">→</span>
+          <span style="font-size:11px;background:rgba(0,212,255,0.07);border:1px solid rgba(0,212,255,0.2);color:#90c8e0;padding:3px 9px;border-radius:12px">Resourcing</span><span style="color:#2a6a80;font-size:11px">→</span>
+          <span style="font-size:11px;background:rgba(0,212,255,0.07);border:1px solid rgba(0,212,255,0.2);color:#90c8e0;padding:3px 9px;border-radius:12px">Receiving</span><span style="color:#2a6a80;font-size:11px">→</span>
+          <span style="font-size:11px;background:rgba(0,212,255,0.07);border:1px solid rgba(0,212,255,0.2);color:#90c8e0;padding:3px 9px;border-radius:12px">Execution</span><span style="color:#2a6a80;font-size:11px">→</span>
+          <span style="font-size:11px;background:rgba(0,255,136,0.1);border:1px solid rgba(0,255,136,0.3);color:#60c090;padding:3px 9px;border-radius:12px">Closed</span>
+        </div>
+      </div>
+    </div>
+
+    <div style="background:white;border:1px solid var(--gray-300);border-radius:8px;padding:20px;margin-bottom:16px;">
+      <h3 style="font-size:14px;font-weight:700;color:var(--navy);margin-bottom:10px;">2 — New Workflow</h3>
+      <p style="font-size:14px;color:var(--gray-700);">Create a new workflow named <strong>"MTE Task Workflow"</strong> that connects these statuses in a linear sequence (New Request → In Design → … → Closed). Closed will be the final step.</p>
+    </div>
+
+    <div style="background:white;border:1px solid var(--gray-300);border-radius:8px;padding:20px;margin-bottom:16px;">
+      <h3 style="font-size:14px;font-weight:700;color:var(--navy);margin-bottom:14px;">3 — New Custom Fields</h3>
+      <p style="font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--gray-500);margin-bottom:8px;">Responsible Party Fields</p>
+      <div class="field-grid" style="margin-bottom:16px;">
+        <div class="field-item"><div class="field-name">Owning Engineer</div><div class="field-type">User Picker (single user)</div></div>
+        <div class="field-item"><div class="field-name">Design Engineer</div><div class="field-type">User Picker (single user)</div></div>
+        <div class="field-item"><div class="field-name">Manufacturing Engineer</div><div class="field-type">User Picker (single user)</div></div>
+        <div class="field-item"><div class="field-name">Weld Engineer</div><div class="field-type">User Picker (single user)</div></div>
+        <div class="field-item"><div class="field-name">Industrial Engineer</div><div class="field-type">User Picker (single user)</div></div>
+        <div class="field-item"><div class="field-name">Equipment Engineer</div><div class="field-type">User Picker (single user)</div></div>
+        <div class="field-item"><div class="field-name">Quality Engineer</div><div class="field-type">User Picker (single user)</div></div>
+        <div class="field-item"><div class="field-name">Supply Chain Contact</div><div class="field-type">User Picker (single user)</div></div>
+      </div>
+      <p style="font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--gray-500);margin-bottom:8px;">Data &amp; Link Fields</p>
+      <div class="field-grid">
+        <div class="field-item"><div class="field-name">Teamcenter EBOM Link</div><div class="field-type">URL Field</div></div>
+        <div class="field-item"><div class="field-name">Oracle PO Link</div><div class="field-type">URL Field</div></div>
+        <div class="field-item"><div class="field-name">Forge Work Plan Link</div><div class="field-type">URL Field</div></div>
+        <div class="field-item"><div class="field-name">Part Number (ENG)</div><div class="field-type">Text Field (single line)</div></div>
+        <div class="field-item"><div class="field-name">Part Number (MFG)</div><div class="field-type">Text Field (single line)</div></div>
+        <div class="field-item"><div class="field-name">Supplier</div><div class="field-type">Text Field (single line)</div></div>
+        <div class="field-item"><div class="field-name">Delivery ETA</div><div class="field-type">Date Picker</div></div>
+      </div>
+    </div>
+
+    <div style="background:white;border:1px solid var(--gray-300);border-radius:8px;padding:20px;">
+      <h3 style="font-size:14px;font-weight:700;color:var(--navy);margin-bottom:10px;">4 — Update the Workflow Scheme</h3>
+      <p style="font-size:14px;color:var(--gray-700);">Edit the project's scheme, <strong>"MTE: Software Simplified Workflow Scheme,"</strong> to assign the new <strong>"MTE Task Workflow"</strong> to the <strong>Task</strong> and <strong>Sub-task</strong> issue types. Ensure the other issue types (Epic, Bug, Story) remain on their current simplified workflow.</p>
+    </div>
+  </div>
+
+</div><!-- /tab-process -->
+
+
+<!-- ═══════════════════════════════════════════════
+     TAB 3 — HOW-TO GUIDE & KNOWLEDGE BASE
+═══════════════════════════════════════════════ -->
+<div id="tab-howto" class="tab-panel">
+
+  <div class="section">
+    <h2 class="section-title"><span class="num">1</span>What Is This Tool?</h2>
+    <div class="callout blue">
+      The <strong>Coupon Fab MTE Work Intake</strong> system is a web-based tool that guides your manufacturing team through the 9-phase coupon fabrication process — from the initial design request all the way through work execution and quality sign-off. It replaces disconnected spreadsheets and email chains with a single tracked workflow, and automatically syncs status to Jira.
+    </div>
+    <p style="font-size:14px;color:var(--gray-700);margin-top:12px;">Think of it as a digital work order that moves from desk to desk — each role sees only what they need to do, confirms their step, and passes it forward.</p>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title"><span class="num">2</span>Getting Started — Login Credentials</h2>
+    <p style="font-size:14px;color:var(--gray-700);margin-bottom:14px;">Open the app at <strong>http://***************</strong> in your browser. You'll see two options on the landing page:</p>
+    <div class="demo-grid" style="margin-bottom:20px;">
+      <div class="demo-card" style="border-top:3px solid var(--blue)">
+        <div class="demo-label">Preview Mode</div>
+        <div class="demo-value" style="font-size:13px;margin-top:4px;color:var(--gray-700)">See all 9 phases instantly, click through every form. No login required. Submits are disabled — read-only exploration.</div>
+      </div>
+      <div class="demo-card" style="border-top:3px solid var(--amber)">
+        <div class="demo-label">Demo Mode</div>
+        <div class="demo-value" style="font-size:13px;margin-top:4px;color:var(--gray-700)">Full live workflow with per-role login. Submits are enabled. Jira updates fire in real-time. Use this for actual execution.</div>
+      </div>
+    </div>
+    <p style="font-size:14px;color:var(--gray-700);margin-bottom:10px;font-weight:600;">Demo Mode — login credentials (all passwords: <code style="background:var(--gray-100);padding:1px 6px;border-radius:3px;font-family:monospace">demo</code>)</p>
+    <div class="tbl-wrap">
+      <table class="cred-table">
+        <thead>
+          <tr><th>Username</th><th>Password</th><th>Role</th><th>Display Name</th><th>Active Phases</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="un">stakeholder</td><td><span class="pw">demo</span></td><td>Stakeholder</td><td>Alex Torres</td><td><span class="badge badge-blue">1</span></td></tr>
+          <tr><td class="un">de_user</td><td><span class="pw">demo</span></td><td>Design Engineer</td><td>Jordan Lee</td><td><span class="badge badge-blue">1</span> <span class="badge badge-blue">2</span> <span class="badge badge-blue">3</span></td></tr>
+          <tr><td class="un">me_user</td><td><span class="pw">demo</span></td><td>Manufacturing Engineer</td><td>Sam Rivera</td><td><span class="badge badge-blue">1</span> <span class="badge badge-blue">2</span> <span class="badge badge-blue">3</span> <span class="badge badge-blue">5</span></td></tr>
+          <tr><td class="un">weld_eng</td><td><span class="pw">demo</span></td><td>Weld Engineer</td><td>Casey Kim</td><td><span class="badge badge-blue">1</span> <span class="badge badge-blue">2</span> <span class="badge badge-blue">5</span></td></tr>
+          <tr><td class="un">supply_chain</td><td><span class="pw">demo</span></td><td>Supply Chain</td><td>Morgan Chen</td><td><span class="badge badge-blue">4</span> <span class="badge badge-blue">7</span></td></tr>
+          <tr><td class="un">ie_user</td><td><span class="pw">demo</span></td><td>Industrial Engineer</td><td>Riley Adams</td><td><span class="badge badge-blue">6</span></td></tr>
+          <tr><td class="un">qe_user</td><td><span class="pw">demo</span></td><td>Quality Engineer</td><td>Drew Patel</td><td><span class="badge badge-blue">5</span> <span class="badge badge-blue">7</span> <span class="badge badge-navy">8</span> <span class="badge badge-blue">9</span></td></tr>
+          <tr><td class="un">warehouse</td><td><span class="pw">demo</span></td><td>Warehouse/MMO</td><td>Quinn Nguyen</td><td><span class="badge badge-blue">7</span></td></tr>
+          <tr><td class="un">mechanic</td><td><span class="pw">demo</span></td><td>Mechanic</td><td>Chris Martinez</td><td><span class="badge badge-navy">8 ★</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+
+
+  <div class="section">
+    <h2 class="section-title"><span class="num">3</span>Role-by-Role Guide</h2>
+
+    <div class="role-guide-card">
+      <h4>Stakeholder <span class="badge badge-blue" style="font-size:11px">Phase 1 only</span></h4>
+      <div class="phases-row">Alex Torres — login: <code style="font-family:monospace">stakeholder / demo</code></div>
+      <ol>
+        <li>Log in as <strong>stakeholder</strong> and click <strong>Enter Demo</strong>.</li>
+        <li>From the dashboard, click <strong>New Work Order</strong> to open the Phase 1 intake form.</li>
+        <li>Fill in: Part Number, Description, Priority (High/Medium/Low), NX Model Reference, TC Engineering Item number, and any notes.</li>
+        <li>Fields outlined in amber are required — the form won't submit until they're filled in.</li>
+        <li>Click <strong>Submit Request</strong>. A Jira ticket is automatically created in the MTE project and the work order advances to Phase 2.</li>
+        <li>Your job is done. The DE, ME, and Weld Engineer now take over.</li>
+      </ol>
+    </div>
+
+    <div class="role-guide-card">
+      <h4>Design Engineer (DE) <span class="badge badge-blue" style="font-size:11px">Phases 1, 2, 3</span></h4>
+      <div class="phases-row">Jordan Lee — login: <code style="font-family:monospace">de_user / demo</code></div>
+      <ol>
+        <li>Log in, go to the dashboard. Work orders awaiting your action are highlighted.</li>
+        <li><strong>Phase 2:</strong> Click the work order → click <strong>Confirm Alignment — Design Engineer</strong>. Add a comment (e.g., "NX model reviewed, design intent confirmed, no conflicts with fab requirements").</li>
+        <li>Once all three roles (DE, ME, Weld Engineer) have signed off, you'll see the <strong>Advance to Phase 3</strong> button. Click it.</li>
+        <li><strong>Phase 3:</strong> Confirm the NX model is checked in, enter the TC Item Reference number, and click <strong>Advance to Phase 4/5/6</strong>. This triggers the parallel branches.</li>
+      </ol>
+    </div>
+
+    <div class="role-guide-card">
+      <h4>Manufacturing Engineer (ME) <span class="badge badge-blue" style="font-size:11px">Phases 1, 2, 3, 5</span></h4>
+      <div class="phases-row">Sam Rivera — login: <code style="font-family:monospace">me_user / demo</code></div>
+      <ol>
+        <li><strong>Phase 2:</strong> Confirm alignment — review fabrication approach, tooling, and process; add comment and sign off.</li>
+        <li><strong>Phase 3:</strong> Read-only view while DE completes. No action needed.</li>
+        <li><strong>Phase 5:</strong> Once Phase 3 is complete, review and sign off on work instructions (e.g., "WI-2024-042 / BOP-Rev-B"). Enter your document reference and click Confirm.</li>
+        <li>When all three Phase 5 roles are signed, click <strong>Advance to Phase 6</strong>.</li>
+      </ol>
+    </div>
+
+    <div class="role-guide-card">
+      <h4>Supply Chain <span class="badge badge-blue" style="font-size:11px">Phases 4, 7</span></h4>
+      <div class="phases-row">Morgan Chen — login: <code style="font-family:monospace">supply_chain / demo</code></div>
+      <ol>
+        <li><strong>Phase 4:</strong> Appears in parallel with Phases 5 and 6 after Phase 3 completes. Fill in PR Number, Vendor/Supplier, Expected Delivery Date, RFQ Reference, PO Number, and notes. Click <strong>Submit Procurement</strong>.</li>
+        <li><strong>Phase 7:</strong> When material arrives, confirm receipt — enter PO/Packing Slip reference and click Confirm. Quality and Warehouse also need to sign off before Phase 8 unlocks.</li>
+      </ol>
+    </div>
+
+    <div class="role-guide-card">
+      <h4>Quality Engineer (QE) <span class="badge badge-blue" style="font-size:11px">Phases 5, 7, 8, 9</span></h4>
+      <div class="phases-row">Drew Patel — login: <code style="font-family:monospace">qe_user / demo</code></div>
+      <ol>
+        <li><strong>Phase 5:</strong> Sign off on work instructions — enter your Inspection Plan reference (e.g., "QIP-CPN-0042-Rev1") and click Confirm.</li>
+        <li><strong>Phase 7:</strong> Confirm incoming inspection — enter Inspection Record reference and click Confirm.</li>
+        <li><strong>Phase 8:</strong> Final quality sign-off after execution — enter QC record reference.</li>
+        <li><strong>Phase 9:</strong> Initiate NCR assessment. Check the box if a non-conformance was identified. Submit the assessment and wait for ME and Mechanic disposition sign-offs.</li>
+      </ol>
+    </div>
+
+    <div class="role-guide-card">
+      <h4>Industrial Engineer (IE) <span class="badge badge-blue" style="font-size:11px">Phase 6 only</span></h4>
+      <div class="phases-row">Riley Adams — login: <code style="font-family:monospace">ie_user / demo</code></div>
+      <ol>
+        <li><strong>Phase 6:</strong> Fill in Assigned Technician, Scheduled Start/End Dates, Shift/Crew, Work Package Reference, and notes. Click <strong>Submit Work Allocation</strong>.</li>
+        <li>Validates that end date is after start date — fix the dates if you see a warning.</li>
+      </ol>
+    </div>
+
+    <div class="role-guide-card">
+      <h4>Mechanic (Mfg Tech) <span class="badge badge-navy" style="font-size:11px">Phase 8 — Convergence ★</span></h4>
+      <div class="phases-row">Chris Martinez — login: <code style="font-family:monospace">mechanic / demo</code></div>
+      <ol>
+        <li><strong>Phase 8</strong> is the convergence point — all upstream branches (Phases 4, 5, 6, 7) must be complete before Phase 8 unlocks.</li>
+        <li>Sign off on work completion — enter Work Completion Notes and Redline Reference (e.g., "All steps completed per WI-2024-042, redlines attached as-built Rev A").</li>
+        <li>ME and QE also sign off. When all three are confirmed, click <strong>Advance to Phase 9</strong>.</li>
+      </ol>
+    </div>
+
+    <div class="role-guide-card">
+      <h4>Warehouse / MMO <span class="badge badge-blue" style="font-size:11px">Phase 7 only</span></h4>
+      <div class="phases-row">Quinn Nguyen — login: <code style="font-family:monospace">warehouse / demo</code></div>
+      <ol>
+        <li><strong>Phase 7:</strong> Confirm material storage — enter Storage Location/Bin reference (e.g., "Rack B-12 / Bin 04") and click Confirm.</li>
+        <li>Once Supply Chain, QE, and Warehouse all sign off, Phase 8 becomes available.</li>
+      </ol>
+    </div>
+
+  </div>
+
+  <div class="section">
+    <h2 class="section-title"><span class="num">4</span>Use Cases &amp; Walkthrough Examples</h2>
+
+    <div class="use-case-card">
+      <div class="scenario-label">Use Case 1 — Standard End-to-End</div>
+      <h4>Starting a new coupon fabrication request from scratch</h4>
+      <p>A stakeholder needs a new hull coupon created for weld testing. They log in, submit the request, and the system automatically routes it through all 9 phases with each role completing their part in sequence.</p>
+      <ul class="use-case-steps">
+        <li data-step="1">Log in as <strong>stakeholder</strong>. Click <strong>New Work Order</strong>. Fill in: Part No. <em>SUB-CPN-0042</em>, Description <em>"Hull coupon — weld test specimen for rib-to-shell joint qualification"</em>, Priority <em>High</em>, NX Model Ref <em>NX-Model-HullCPN-v3.2</em>, TC Item <em>TC-10045-B</em>. Click <strong>Submit</strong>.</li>
+        <li data-step="2">Log in as <strong>de_user</strong>. Open the work order → Phase 2 → confirm alignment as Design Engineer. Add comment: <em>"NX model reviewed, design intent confirmed."</em></li>
+        <li data-step="3">Log in as <strong>me_user</strong> → Phase 2 → confirm alignment as ME. Log in as <strong>weld_eng</strong> → Phase 2 → confirm as Weld Engineer.</li>
+        <li data-step="4">Log back in as <strong>de_user</strong>. Phase 2 now shows 3/3 signed. Click <strong>Advance to Phase 3</strong>. On Phase 3, confirm NX completion, enter TC Item Reference. Click <strong>Advance</strong>.</li>
+        <li data-step="5">Phases 4, 5, and 6 now run in parallel. Each role (Supply Chain, ME/Weld/QE, IE) completes their phase independently.</li>
+        <li data-step="6">Log in as <strong>mechanic</strong>. Once Phases 4–7 are all done, Phase 8 unlocks. Sign off on execution. ME and QE also sign off. Advance to Phase 9.</li>
+        <li data-step="7">Log in as <strong>qe_user</strong>. Submit the NCR assessment (no NCR for a clean close). ME and Mechanic confirm disposition. Click <strong>Close Work Order</strong>.</li>
+      </ul>
+      <div class="example-box"><strong>Result:</strong> Work order is closed. Full phase history is logged. Jira ticket reflects "Closed" status. The entire 9-phase cycle is documented with role-level sign-offs and timestamps.</div>
+    </div>
+
+    <div class="use-case-card">
+      <div class="scenario-label">Use Case 2 — Demo Walkthrough (Preview Mode)</div>
+      <h4>Showing the system to the manufacturing team before going live</h4>
+      <p>Before the March 20 demo, Hector wants to click through the full workflow to get comfortable with the screens. Use Preview Mode — no login, no data saved, no Jira calls.</p>
+      <ul class="use-case-steps">
+        <li data-step="1">Open the app at <strong>http://***************</strong>. Click <strong>Enter Preview</strong>.</li>
+        <li data-step="2">The workflow diagram appears. Click any phase node — the form for that phase opens instantly with sample data pre-filled.</li>
+        <li data-step="3">Use the left/right arrow keys on your keyboard to navigate between phases without using the mouse.</li>
+        <li data-step="4">Walk through all 9 phases, showing what each role sees and what they're asked to do. The amber banner at the top reminds everyone this is preview-only.</li>
+        <li data-step="5">Nothing is saved. Refresh the page to reset.</li>
+      </ul>
+      <div class="example-box"><strong>Best for:</strong> Demos, training sessions, onboarding new team members, or confirming the UI before a live run.</div>
+    </div>
+
+    <div class="use-case-card">
+      <div class="scenario-label">Use Case 3 — Multi-Role Sign-Off (Phase 2 / Phase 5)</div>
+      <h4>Three different people need to approve the same work order before it can advance</h4>
+      <p>Phase 2 (alignment) and Phase 5 (work instructions) both require sign-off from three separate roles. Each person logs in independently and confirms their part — the system tracks who has signed and who hasn't.</p>
+      <ul class="use-case-steps">
+        <li data-step="1">After Phase 1 is submitted, have each of the three people open the app on their own device (or switch logins).</li>
+        <li data-step="2"><strong>de_user</strong> logs in → clicks the work order → signs off as Design Engineer. Progress bar shows 1/3.</li>
+        <li data-step="3"><strong>me_user</strong> logs in → signs off. Progress shows 2/3.</li>
+        <li data-step="4"><strong>weld_eng</strong> logs in → signs off. Progress shows 3/3.</li>
+        <li data-step="5">The <strong>Advance</strong> button only appears after all three sign-offs are recorded. Only the DE role sees the advance button and can push the work order forward.</li>
+      </ul>
+      <div class="example-box"><strong>Key point:</strong> Sign-offs are role-specific and persisted in the database. If someone refreshes the page, their sign-off is still there. You can't sign off twice for the same role.</div>
+    </div>
+
+    <div class="use-case-card">
+      <div class="scenario-label">Use Case 4 — Required Field Validation (Phase 1)</div>
+      <h4>A team member tries to submit a form with missing information</h4>
+      <p>The system won't let a work order advance if required fields are empty. Required fields are highlighted in amber when you try to submit without them.</p>
+      <ul class="use-case-steps">
+        <li data-step="1">Log in as <strong>stakeholder</strong> and open a new work order.</li>
+        <li data-step="2">Leave the Part Number field blank and click Submit.</li>
+        <li data-step="3">The Part Number field border turns amber, and an error message appears below it: "Required field."</li>
+        <li data-step="4">Fill in the missing field and resubmit. The form advances normally.</li>
+      </ul>
+      <div class="example-box"><strong>What amber means:</strong> Any field outlined in amber is required and currently missing. Fill it in before submitting.</div>
+    </div>
+
+    <div class="use-case-card">
+      <div class="scenario-label">Use Case 5 — Checking Jira Status</div>
+      <h4>Tracking where a work order is in Jira without leaving the app</h4>
+      <p>Every work order is linked to a Jira MTE ticket. The dashboard shows a live Jira badge next to each work order. You can click it to open the Jira issue directly.</p>
+      <ul class="use-case-steps">
+        <li data-step="1">Log in to the app (any role). Open the dashboard.</li>
+        <li data-step="2">Find your work order in the list. The blue badge next to it shows the Jira ticket number (e.g., <strong>MTE-12 ↗</strong>).</li>
+        <li data-step="3">Click the badge — it opens the Jira issue in a new tab.</li>
+        <li data-step="4">Each time a phase advances, the Jira ticket label is automatically updated (e.g., "phase-3-design", "phase-4-procure").</li>
+        <li data-step="5">Phase 3 completion also transitions the Jira ticket to "In Progress" automatically.</li>
+      </ul>
+      <div class="example-box"><strong>Jira project:</strong> MTE at <a href="https://taktengineering-team-flogkni8.atlassian.net" target="_blank">taktengineering-team-flogkni8.atlassian.net</a></div>
+    </div>
+
+    <div class="use-case-card">
+      <div class="scenario-label">Use Case 6 — Non-Conformance (Phase 9)</div>
+      <h4>A quality issue is found during final inspection — filing an NCR</h4>
+      <p>After work execution, the QE identifies a dimensional non-conformance. Phase 9 handles the NCR process with sign-offs from QE, ME, and Mechanic.</p>
+      <ul class="use-case-steps">
+        <li data-step="1">Log in as <strong>qe_user</strong>. Open Phase 9 for the affected work order.</li>
+        <li data-step="2">Check the box: <em>"Non-conformance identified — NCR required."</em></li>
+        <li data-step="3">Click <strong>Submit NCR Assessment</strong>.</li>
+        <li data-step="4">Log in as <strong>me_user</strong> → Phase 9 → Confirm Disposition as Manufacturing Engineer.</li>
+        <li data-step="5">Log in as <strong>mechanic</strong> → Phase 9 → Confirm Disposition as Mechanic.</li>
+        <li data-step="6">Once both dispositions are confirmed, the QE can close the work order.</li>
+      </ul>
+      <div class="example-box"><strong>If there's no issue:</strong> Leave the NCR checkbox unchecked. The system shows "No non-conformance — cleared for closure." ME and Mechanic still confirm, then the work order closes cleanly.</div>
+    </div>
+
+  </div>
+
+  <div class="section">
+    <h2 class="section-title"><span class="num">5</span>Frequently Asked Questions</h2>
+    <div style="display:flex;flex-direction:column;gap:12px;">
+
+      <div style="background:white;border:1px solid var(--gray-300);border-radius:6px;padding:16px 20px;">
+        <p style="font-weight:600;color:var(--navy);margin-bottom:6px;font-size:14px;">Q: I submitted a form but don't see the work order on the dashboard. What happened?</p>
+        <p style="font-size:14px;color:var(--gray-700);">Check that you're logged in with the role that owns the current phase. The dashboard shows active work orders for your role. Try logging out and back in, or refresh the page.</p>
+      </div>
+
+      <div style="background:white;border:1px solid var(--gray-300);border-radius:6px;padding:16px 20px;">
+        <p style="font-weight:600;color:var(--navy);margin-bottom:6px;font-size:14px;">Q: The Advance button isn't showing up in Phase 2. Why?</p>
+        <p style="font-size:14px;color:var(--gray-700);">All three roles (DE, ME, Weld Engineer) must sign off before the Advance button appears — and only the DE login sees it. Check the sign-off progress bar. If it shows less than 3/3, at least one role hasn't confirmed yet.</p>
+      </div>
+
+      <div style="background:white;border:1px solid var(--gray-300);border-radius:6px;padding:16px 20px;">
+        <p style="font-weight:600;color:var(--navy);margin-bottom:6px;font-size:14px;">Q: Can I go back to a previous phase?</p>
+        <p style="font-size:14px;color:var(--gray-700);">You can view any completed phase using the workflow diagram (click the phase node). However, you can't re-submit or modify a phase that's already been completed and advanced. Contact the system administrator to reset a work order if needed.</p>
+      </div>
+
+      <div style="background:white;border:1px solid var(--gray-300);border-radius:6px;padding:16px 20px;">
+        <p style="font-weight:600;color:var(--navy);margin-bottom:6px;font-size:14px;">Q: Why are Phases 7, 8, and 9 locked?</p>
+        <p style="font-size:14px;color:var(--gray-700);">These phases unlock only after all upstream work is completed. Phase 8 (Work Execution) requires Phases 4, 5, 6, and 7 to all be done first — it's the convergence point. The locked screen tells you which upstream phases are still pending.</p>
+      </div>
+
+      <div style="background:white;border:1px solid var(--gray-300);border-radius:6px;padding:16px 20px;">
+        <p style="font-weight:600;color:var(--navy);margin-bottom:6px;font-size:14px;">Q: Does the app require an internet connection?</p>
+        <p style="font-size:14px;color:var(--gray-700);">The app runs fully locally. However, Jira integration does require network access to the Atlassian instance. If Jira is unavailable, work orders can still be created locally — the Jira sync will fail silently and log an error.</p>
+      </div>
+
+      <div style="background:white;border:1px solid var(--gray-300);border-radius:6px;padding:16px 20px;">
+        <p style="font-weight:600;color:var(--navy);margin-bottom:6px;font-size:14px;">Q: How do I navigate between phases without a mouse?</p>
+        <p style="font-size:14px;color:var(--gray-700);">Use the <strong>← →</strong> arrow keys on your keyboard to move between phases in the workflow diagram. This works in both Preview and Demo modes.</p>
+      </div>
+
+      <div style="background:white;border:1px solid var(--gray-300);border-radius:6px;padding:16px 20px;">
+        <p style="font-weight:600;color:var(--navy);margin-bottom:6px;font-size:14px;">Q: What does the amber highlight mean on a form field?</p>
+        <p style="font-size:14px;color:var(--gray-700);">Amber (orange-yellow) on a field border means it's a required field that hasn't been filled in yet. You won't be able to submit the form until all amber-highlighted fields have values.</p>
+      </div>
+
+    </div>
+  </div>
+
+</div><!-- /tab-howto -->
+
+</div><!-- /shell -->
+
+<footer class="footer">
+  Coupon Fab MTE — Work Intake System V1 &nbsp;·&nbsp; Demo Date: Friday, March 20 &nbsp;·&nbsp; Presenter: Ben &nbsp;·&nbsp; Operator: ---- -----
+</footer>
+
+<script>
+  function switchTab(id, btn) {
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('tab-' + id).classList.add('active');
+    btn.classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  document.addEventListener('keydown', function(e) {
+    const tabs = ['overview', 'process', 'howto'];
+    const btns = document.querySelectorAll('.tab-btn');
+    const active = document.querySelector('.tab-panel.active');
+    if (!active) return;
+    const idx = tabs.indexOf(active.id.replace('tab-', ''));
+    if (e.key === 'ArrowRight' && idx < tabs.length - 1) switchTab(tabs[idx+1], btns[idx+1]);
+    if (e.key === 'ArrowLeft'  && idx > 0)               switchTab(tabs[idx-1], btns[idx-1]);
+  });
+</script>
+</body>
+</html>

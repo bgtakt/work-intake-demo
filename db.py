@@ -135,6 +135,22 @@ def init_db():
             comment      TEXT NOT NULL DEFAULT ''
         )
     """)
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS feedback_tickets (
+            id              INTEGER PRIMARY KEY AUTOINCREMENT,
+            ticket_type     TEXT NOT NULL,
+            title           TEXT NOT NULL,
+            description     TEXT NOT NULL,
+            priority        TEXT NOT NULL DEFAULT 'Medium',
+            status          TEXT NOT NULL DEFAULT 'Open',
+            screenshot_b64  TEXT,
+            screenshot_name TEXT,
+            submitted_by    TEXT NOT NULL,
+            display_name    TEXT NOT NULL,
+            submitted_at    TEXT DEFAULT (datetime('now')),
+            updated_at      TEXT DEFAULT (datetime('now'))
+        )
+    """)
     conn.commit()
 
     for username, password, role, display_name in SEED_USERS:
@@ -395,3 +411,47 @@ def get_phase_comments(coupon_id: str) -> list:
     ).fetchall()]
     conn.close()
     return rows
+
+
+# ── FEEDBACK TICKETS ──────────────────────────────────────────────────────────
+
+def create_feedback_ticket(ticket_type: str, title: str, description: str, priority: str,
+                           screenshot_b64: str, screenshot_name: str,
+                           submitted_by: str, display_name: str) -> int:
+    conn = _conn()
+    cur = conn.execute(
+        """INSERT INTO feedback_tickets
+           (ticket_type, title, description, priority, screenshot_b64, screenshot_name, submitted_by, display_name)
+           VALUES (?,?,?,?,?,?,?,?)""",
+        (ticket_type, title, description, priority, screenshot_b64, screenshot_name, submitted_by, display_name),
+    )
+    tid = cur.lastrowid
+    conn.commit()
+    conn.close()
+    return tid
+
+
+def list_feedback_tickets() -> list:
+    conn = _conn()
+    rows = [dict(r) for r in conn.execute(
+        "SELECT * FROM feedback_tickets ORDER BY submitted_at DESC"
+    ).fetchall()]
+    conn.close()
+    return rows
+
+
+def get_feedback_ticket(ticket_id: int):
+    conn = _conn()
+    row = conn.execute("SELECT * FROM feedback_tickets WHERE id=?", (ticket_id,)).fetchone()
+    conn.close()
+    return dict(row) if row else None
+
+
+def update_feedback_status(ticket_id: int, new_status: str):
+    conn = _conn()
+    conn.execute(
+        "UPDATE feedback_tickets SET status=?, updated_at=datetime('now') WHERE id=?",
+        (new_status, ticket_id),
+    )
+    conn.commit()
+    conn.close()
